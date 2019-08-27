@@ -15,18 +15,26 @@ using System;
 
 
 public class ReadJson : MonoBehaviour
+{
+    // Use this for initialization
+    void Start()
     {
-        // Start is called before the first frame update
-        void Start()
-        {
-        
 
-        }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
+        string jsonTest = File.ReadAllText(Application.dataPath + "/Scripts/testdata.json", Encoding.UTF8);
+        SegmentListj obj = JsonUtility.FromJson<SegmentListj>(jsonTest);
+        //Debug.Log(obj.startx);
+        //Debug.Log(obj.endy);
+        //foreach (var inter in obj.segementArrayj)
+        //{
+        //    Debug.Log(inter);
+        //}
     }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+}
 

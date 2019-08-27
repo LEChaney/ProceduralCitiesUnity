@@ -12,4 +12,4 @@ namespace Assets.Scripts
         public List<Segmentj> List;//这个名字要和json数据中的对象对应
     }
 }
-}
+
