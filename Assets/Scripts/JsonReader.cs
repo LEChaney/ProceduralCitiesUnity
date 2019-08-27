@@ -32,10 +32,13 @@ public class JsonReader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SegmentList roadSegments = new SegmentList();
+
+    
+    SegmentList roadSegments = new SegmentList();
         roadSegments.roadSegments.Add(new Segment(new Vector2(0, 0), new Vector2(1, 0)));
         roadSegments.roadSegments.Add(new Segment(new Vector2(1, 0), new Vector2(1, 1)));
         Debug.Log(JsonUtility.ToJson(roadSegments));
+        
     }
 
     // Update is called once per frame

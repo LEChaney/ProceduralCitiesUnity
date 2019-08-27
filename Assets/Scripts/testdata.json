@@ -1,0 +1,33 @@
+{
+  "List": 
+  [
+    {
+      "startx": 1,
+      "starty": 1,
+      "endx": 2,
+      "endy": 2,
+      "segementArrayj": [
+        1,
+        2,
+        3
+      ]
+    }
+    ,
+    {
+    "startx":
+    11,
+    "starty":
+    12,
+    "endx":
+    22,
+    "endy":
+    27,
+    "segementArrayj":
+    [
+      1,
+      6,
+      3
+    ]
+    }
+  ]
+}
