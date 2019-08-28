@@ -10,6 +10,7 @@ public class RoadNetwork : MonoBehaviour
     public List<RoadVertex> RoadVertices { get => roadVertices; }
 
     public TextAsset inputJsonFile;
+    public Material roadMaterial;
 
     [SerializeField]
     [HideInInspector]
@@ -74,7 +75,7 @@ public class RoadNetwork : MonoBehaviour
         myLine.transform.position = start;
         myLine.AddComponent<LineRenderer>();
         LineRenderer lr = myLine.GetComponent<LineRenderer>();
-        lr.material = new Material(Shader.Find("Lightweight Render Pipeline/Particles/Unlit"));
+        lr.material = roadMaterial;
         lr.startColor = color;
         lr.endColor = color;
         lr.startWidth = 0.1f;
