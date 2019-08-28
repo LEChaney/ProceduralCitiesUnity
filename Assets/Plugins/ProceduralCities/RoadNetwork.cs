@@ -9,6 +9,8 @@ public class RoadNetwork : MonoBehaviour
     public List<RoadSegment> RoadSegments { get => roadSegments; }
     public List<RoadVertex> RoadVertices { get => roadVertices; }
 
+    public TextAsset inputJsonFile;
+
     [SerializeField]
     [HideInInspector]
     private List<RoadSegment> roadSegments = new List<RoadSegment>();

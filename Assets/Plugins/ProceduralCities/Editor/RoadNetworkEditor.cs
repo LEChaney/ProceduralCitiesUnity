@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.IO;
 
 [CustomEditor(typeof(RoadNetwork))]
 public class RoadNetworkEditor : Editor
 {
+    string jsonOutputPath = "Assets/Resources/out_road_network.json";
+
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
@@ -29,6 +32,18 @@ public class RoadNetworkEditor : Editor
             }
 
             roadNetwork.UpdateLinks();
+        }
+
+        jsonOutputPath = GUILayout.TextField(jsonOutputPath, 100);
+        if (GUILayout.Button("Save to json file"))
+        {
+            string jsonOutput = JsonUtility.ToJson(roadNetwork);
+            File.WriteAllText(jsonOutputPath, jsonOutput);
+        }
+
+        if (GUILayout.Button("Load from json file"))
+        {
+            JsonUtility.FromJsonOverwrite(roadNetwork.inputJsonFile.text, roadNetwork);
         }
     }
 }
