@@ -8,11 +8,15 @@ public class JsonTest : MonoBehaviour
     void Start()
     {
         var roadNetwork = new RoadNetwork();
-        roadNetwork.RoadSegments.Add(new RoadSegment(roadNetwork, 0, 1));
-        roadNetwork.RoadSegments.Add(new RoadSegment(roadNetwork, 1, 2));
         roadNetwork.RoadVertices.Add(new RoadVertex(roadNetwork, 0, 0));
         roadNetwork.RoadVertices.Add(new RoadVertex(roadNetwork, 50, 0));
         roadNetwork.RoadVertices.Add(new RoadVertex(roadNetwork, 100, 0));
+
+        roadNetwork.RoadSegments.Add(new RoadSegment(roadNetwork, 0, 1));
+        roadNetwork.RoadSegments.Add(new RoadSegment(roadNetwork, 1, 2));
+
+        roadNetwork.UpdateLinks();
+
         Debug.Log(JsonUtility.ToJson(roadNetwork, true));
     }
 
