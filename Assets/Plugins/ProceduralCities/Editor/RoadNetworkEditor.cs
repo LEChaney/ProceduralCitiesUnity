@@ -43,6 +43,7 @@ public class RoadNetworkEditor : Editor
 
         if (GUILayout.Button("Load from json file"))
         {
+            roadNetwork.Clear();
             JsonUtility.FromJsonOverwrite(roadNetwork.inputJsonFile.text, roadNetwork);
             roadNetwork.UpdateLinks();
         }

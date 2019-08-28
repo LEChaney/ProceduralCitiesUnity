@@ -34,9 +34,6 @@ public class RoadNetwork : MonoBehaviour
     // Updates all vertices so they have the correct references to their connected road segments
     public void UpdateLinks()
     {
-        // Hacky fix for setting up parent road graph
-
-
         // Clear existing connected segments from all vertices
         foreach (RoadVertex roadVertex in roadVertices)
         {
@@ -53,10 +50,37 @@ public class RoadNetwork : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        JsonUtility.FromJsonOverwrite(inputJsonFile.text, this);
+        UpdateLinks();
+
+        foreach (RoadSegment roadSegment in roadSegments)
+        {
+            Color color = new Color(0, 1.0f, 0);
+            DrawLine(roadSegment.StartVertex.Position3D, roadSegment.EndVertex.Position3D, color);
+        }
+    }
+
     public void Clear()
     {
         roadSegments.Clear();
         roadVertices.Clear();
+    }
+
+    private void DrawLine(Vector3 start, Vector3 end, Color color)
+    {
+        GameObject myLine = new GameObject("RoadSegmentRenderer");
+        myLine.transform.position = start;
+        myLine.AddComponent<LineRenderer>();
+        LineRenderer lr = myLine.GetComponent<LineRenderer>();
+        lr.material = new Material(Shader.Find("Lightweight Render Pipeline/Particles/Unlit"));
+        lr.startColor = color;
+        lr.endColor = color;
+        lr.startWidth = 0.1f;
+        lr.endWidth = 0.1f;
+        lr.SetPosition(0, start);
+        lr.SetPosition(1, end);
     }
 }
 
@@ -88,7 +112,6 @@ public class RoadVertex
 
     private List<int> connectedSegmentIndices;
 
-    [NonSerialized]
     public RoadNetwork roadNetwork;
 
     public RoadVertex()
@@ -130,7 +153,6 @@ public class RoadSegment
     public int startVertIndex = -1;
     public int endVertIndex  = -1;
 
-    [NonSerialized]
     public RoadNetwork roadNetwork;
 
     public RoadSegment(RoadNetwork roadNetwork)
