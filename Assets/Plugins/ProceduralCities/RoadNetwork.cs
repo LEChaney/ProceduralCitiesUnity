@@ -34,15 +34,20 @@ public class RoadNetwork : MonoBehaviour
     // Updates all vertices so they have the correct references to their connected road segments
     public void UpdateLinks()
     {
+        // Hacky fix for setting up parent road graph
+
+
         // Clear existing connected segments from all vertices
         foreach (RoadVertex roadVertex in roadVertices)
         {
+            roadVertex.roadNetwork = this;
             roadVertex.ConnectedSegmentIndices.Clear();
         }
 
         // Loop over road segments and add backward references from vertices
         for (int i = 0; i < roadSegments.Count; ++i)
         {
+            roadSegments[i].roadNetwork = this;
             roadSegments[i].StartVertex.ConnectedSegmentIndices.Add(i);
             roadSegments[i].EndVertex.ConnectedSegmentIndices.Add(i);
         }
@@ -76,13 +81,20 @@ public class RoadVertex
 
     public Vector3 Position3D
     {
-        get => new Vector3(position.x, 0, position.y);
+        get => new Vector3(position.x - 500, 0, position.y - 500);
     }
 
     public Vector2 position;
 
-    private List<int> connectedSegmentIndices = new List<int>();
-    private RoadNetwork roadNetwork;
+    private List<int> connectedSegmentIndices;
+
+    [NonSerialized]
+    public RoadNetwork roadNetwork;
+
+    public RoadVertex()
+    {
+        connectedSegmentIndices = new List<int>();
+    }
 
     public RoadVertex(RoadNetwork roadNetwork)
     {
@@ -118,7 +130,8 @@ public class RoadSegment
     public int startVertIndex = -1;
     public int endVertIndex  = -1;
 
-    private RoadNetwork roadNetwork;
+    [NonSerialized]
+    public RoadNetwork roadNetwork;
 
     public RoadSegment(RoadNetwork roadNetwork)
     {
