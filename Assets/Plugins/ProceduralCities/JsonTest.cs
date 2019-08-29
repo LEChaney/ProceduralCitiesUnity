@@ -8,16 +8,14 @@ public class JsonTest : MonoBehaviour
     void Start()
     {
         var roadNetwork = new RoadNetwork();
-        roadNetwork.RoadVertices.Add(new RoadVertex(roadNetwork, 0, 0));
-        roadNetwork.RoadVertices.Add(new RoadVertex(roadNetwork, 50, 0));
-        roadNetwork.RoadVertices.Add(new RoadVertex(roadNetwork, 100, 0));
+        roadNetwork.AddVertex(new RoadVertex(0, 0));
+        roadNetwork.AddVertex(new RoadVertex(50, 0));
+        roadNetwork.AddVertex(new RoadVertex(100, 0));
 
-        roadNetwork.RoadSegments.Add(new RoadSegment(roadNetwork, 0, 1));
-        roadNetwork.RoadSegments.Add(new RoadSegment(roadNetwork, 1, 2));
+        roadNetwork.AddSegment(new RoadSegment(0, 1));
+        roadNetwork.AddSegment(new RoadSegment(1, 2));
 
-        roadNetwork.UpdateLinks();
-
-        Debug.Log(JsonUtility.ToJson(roadNetwork, true));
+        Debug.Log(roadNetwork.ToJson(true));
     }
 
     // Update is called once per frame

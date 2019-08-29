@@ -22,30 +22,28 @@ public class RoadNetworkEditor : Editor
             const int NUM_VERTS = 10000;
             for (int i = 0; i < NUM_VERTS; ++i)
             {
-                roadNetwork.RoadVertices.Add(new RoadVertex(roadNetwork, Random.Range(0, 1000), Random.Range(0, 1000)));
+                roadNetwork.AddVertex(new RoadVertex(Random.Range(0, 1000), Random.Range(0, 1000)));
             }
 
             // Add random connections between vertices
             for (int i = 0; i < 1000; ++i)
             {
-                roadNetwork.RoadSegments.Add(new RoadSegment(roadNetwork, Random.Range(0, NUM_VERTS), Random.Range(0, NUM_VERTS)));
+                roadNetwork.AddSegment(new RoadSegment(Random.Range(0, NUM_VERTS), Random.Range(0, NUM_VERTS)));
             }
 
-            roadNetwork.UpdateLinks();
+            roadNetwork.FixupReferences();
         }
 
         jsonOutputPath = GUILayout.TextField(jsonOutputPath, 100);
         if (GUILayout.Button("Save to json file"))
         {
-            string jsonOutput = JsonUtility.ToJson(roadNetwork);
+            string jsonOutput = roadNetwork.ToJson(true);
             File.WriteAllText(jsonOutputPath, jsonOutput);
         }
 
         if (GUILayout.Button("Load from json file"))
         {
-            roadNetwork.Clear();
-            JsonUtility.FromJsonOverwrite(roadNetwork.inputJsonFile.text, roadNetwork);
-            roadNetwork.UpdateLinks();
+            roadNetwork.FromJsonOverwrite(roadNetwork.inputJsonFile.text);
         }
     }
 }
