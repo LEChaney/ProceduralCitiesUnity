@@ -16,22 +16,7 @@ public class RoadNetworkEditor : Editor
         RoadNetwork roadNetwork = (RoadNetwork)target;
         if (GUILayout.Button("Build Random Road Network"))
         {
-            roadNetwork.Clear();
-
-            // Add random road vertices
-            const int NUM_VERTS = 10000;
-            for (int i = 0; i < NUM_VERTS; ++i)
-            {
-                roadNetwork.AddVertex(new RoadVertex(Random.Range(0, 1000), Random.Range(0, 1000)));
-            }
-
-            // Add random connections between vertices
-            for (int i = 0; i < 1000; ++i)
-            {
-                roadNetwork.AddSegment(new RoadSegment(Random.Range(0, NUM_VERTS), Random.Range(0, NUM_VERTS)));
-            }
-
-            roadNetwork.FixupReferences();
+            roadNetwork.BuildRandom();
         }
 
         jsonOutputPath = GUILayout.TextField(jsonOutputPath, 100);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [Serializable]
 public class RoadNetwork : MonoBehaviour
@@ -87,12 +88,35 @@ public class RoadNetwork : MonoBehaviour
         // De-serialize from json file on play
         FromJsonOverwrite(inputJsonFile.text);
 
+        // BuildRandom();
+
         // Create line renderers for each segment
         for (int i = 0; i < SegmentCount; ++i)
         {
             Color color = new Color(0, 1.0f, 0);
             CreateLineRenderer(GetSegment(i).StartVertex.Position3D, GetSegment(i).EndVertex.Position3D, color);
         }
+    }
+
+    // Clears the current road network and builds a random one in its place
+    public void BuildRandom()
+    {
+        Clear();
+
+        // Add random road vertices
+        const int NUM_VERTS = 10000;
+        for (int i = 0; i < NUM_VERTS; ++i)
+        {
+            AddVertex(new RoadVertex(Random.Range(0, 1000), Random.Range(0, 1000)));
+        }
+
+        // Add random connections between vertices
+        for (int i = 0; i < 1000; ++i)
+        {
+            AddSegment(new RoadSegment(Random.Range(0, NUM_VERTS), Random.Range(0, NUM_VERTS)));
+        }
+
+        FixupReferences();
     }
 
     private void CreateLineRenderer(Vector3 start, Vector3 end, Color color)
@@ -103,7 +127,8 @@ public class RoadNetwork : MonoBehaviour
         myLine.AddComponent<LineRenderer>();
         LineRenderer lr = myLine.GetComponent<LineRenderer>();
         lr.alignment = LineAlignment.TransformZ;
-        
+
+        lr.textureMode = LineTextureMode.Tile;
         lr.numCapVertices = 10;
         lr.material = roadMaterial;
         lr.shadowBias = 0;

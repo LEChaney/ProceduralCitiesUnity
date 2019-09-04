@@ -1,0 +1,42 @@
+{
+  "roadSegments": [
+    {
+      "startVertIndex": 0,
+      "endVertIndex": 1
+    },
+    {
+      "startVertIndex": 1,
+      "endVertIndex": 2
+    },
+    {
+      "startVertIndex": 1,
+      "endVertIndex": 3
+    }
+  ],
+  "roadVertices": [
+    {
+      "position": {
+        "x": 495,
+        "y": 500
+      }
+    },
+    {
+      "position": {
+        "x": 500,
+        "y": 500
+      }
+    },
+    {
+      "position": {
+        "x": 505,
+        "y": 505
+      }
+    },
+    {
+      "position": {
+        "x": 505,
+        "y": 495
+      }
+    }
+  ]
+}
