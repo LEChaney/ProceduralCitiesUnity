@@ -99,13 +99,18 @@ public class RoadNetwork : MonoBehaviour
     {
         GameObject myLine = new GameObject("RoadSegmentRenderer");
         myLine.transform.position = start;
+        myLine.transform.Rotate(new Vector3(90, 0, 0));
         myLine.AddComponent<LineRenderer>();
         LineRenderer lr = myLine.GetComponent<LineRenderer>();
+        lr.alignment = LineAlignment.TransformZ;
+        
+        lr.numCapVertices = 10;
         lr.material = roadMaterial;
+        lr.shadowBias = 0;
         lr.startColor = color;
         lr.endColor = color;
-        lr.startWidth = 0.1f;
-        lr.endWidth = 0.1f;
+        lr.startWidth = 7;
+        lr.endWidth = 7;
         lr.SetPosition(0, start);
         lr.SetPosition(1, end);
     }
@@ -150,7 +155,7 @@ public class RoadVertexView
 
     public Vector3 Position3D
     {
-        get => new Vector3(Data.Position.x - 500, 0, Data.Position.y - 500);
+        get => new Vector3((Data.Position.x - 500) * 10, 0, (Data.Position.y - 500) * 10);
     }
 
     public RoadVertex Data { get; }
