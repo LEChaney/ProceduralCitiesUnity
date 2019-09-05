@@ -11,12 +11,19 @@ public class Mesher
     //    List<int> connectedSegIndices;
     //}
 
-    //// For each road segment we have two vertices associated with each endpoint
-    //private struct RoadSegmentMeshInfo
-    //{
-    //    public RoadMeshEndVerts startVertIndices;
-    //    public RoadMeshEndVerts endVertIndices;
-    //}
+    // For each road segment we have two vertices associated with each endpoint
+    private class RoadSegmentMeshInfo
+    {
+        public RoadSegmentMeshEndInfo startVertIndices;
+        public RoadSegmentMeshEndInfo endVertIndices;
+    }
+
+    // From the point of view of entering the road vertex
+    private class RoadSegmentMeshEndInfo
+    {
+        public int leftMeshVertIdx;
+        public int rightMeshVertIdx;
+    }
 
     private struct RoadSegmentEdges
     {
@@ -30,13 +37,6 @@ public class Mesher
         public Vector2 end;
     }
 
-    //// From the point of view of entering the road vertex
-    //private struct RoadMeshEndVerts
-    //{
-    //    int leftMeshVertIdx;
-    //    int rightMeshVertIdx;
-    //}
-
     public static ProBuilderMesh MeshRoadNetwork(RoadNetwork roadNet)
     {
         var (vertices, faces) = CalcVerticesAndFaces(roadNet);
@@ -49,24 +49,37 @@ public class Mesher
     {
         var vertices = new List<Vector3>();
         var faces = new List<Face>();
+        RoadSegmentMeshInfo[] segmentMeshInfos = new RoadSegmentMeshInfo[roadNet.SegmentCount];
 
         for (int i = 0; i < roadNet.VertCount; ++i)
         {
             // Construct incoming road edge descriptors
             RoadVertexView roadVert = roadNet.GetVertex(i);
-            List<RoadSegmentView> connSegments = roadVert.ConnectedSegments; // Assumed to be sorted in clockwise order
-            var incRoadEdges = new RoadSegmentEdges[connSegments.Count];
-            for (int j = 0; j < connSegments.Count; ++j)
+            List<int> connSegIndices = roadVert.Data.ConnectedSegmentIndices; // Assumed connected segments in clockwise order
+            var incRoadEdges = new RoadSegmentEdges[connSegIndices.Count];
+            var roadMeshEndInfos = new RoadSegmentMeshEndInfo[connSegIndices.Count];
+            for (int j = 0; j < connSegIndices.Count; ++j)
             {
+                // Extract road segment mesh end info to fill out
+                // This is used to assign the vertices we create in this loop to the correct road segment, at the correct end.
+                int curSegmentIndex = connSegIndices[j];
+                ref RoadSegmentMeshInfo curSegmentMeshInfo = ref segmentMeshInfos[curSegmentIndex];
+                if (curSegmentMeshInfo == null)
+                    curSegmentMeshInfo = new RoadSegmentMeshInfo();
+                RoadSegmentView curSegment = roadNet.GetSegment(curSegmentIndex);
+                ref RoadSegmentMeshEndInfo curSegMeshEndInfo = ref ((curSegment.StartVertex.Index != i) ? ref curSegmentMeshInfo.startVertIndices : ref curSegmentMeshInfo.endVertIndices);
+                curSegMeshEndInfo = new RoadSegmentMeshEndInfo();
+                roadMeshEndInfos[j] = curSegMeshEndInfo;
+
                 // Get adjacent vertex on this road segment
-                int adjVertIdx = connSegments[j].StartVertex.Index != i ? connSegments[j].StartVertex.Index : connSegments[j].EndVertex.Index;
+                int adjVertIdx = curSegment.StartVertex.Index != i ? curSegment.StartVertex.Index : curSegment.EndVertex.Index;
                 RoadVertexView adjRoadVert = roadNet.GetVertex(adjVertIdx);
 
                 // Construct the incoming left and right road edge descriptors
                 Vector2 incDir = (roadVert.Position - adjRoadVert.Position).normalized;
                 Vector2 rot90Dir = new Vector2(-incDir.y, incDir.x); // Rotated 90 degrees counter clockwise
-                Vector2 leftOffset = rot90Dir * connSegments[j].HalfWidth;
-                Vector2 rightOffset = -rot90Dir * connSegments[j].HalfWidth;
+                Vector2 leftOffset = rot90Dir * curSegment.HalfWidth;
+                Vector2 rightOffset = -rot90Dir * curSegment.HalfWidth;
                 RoadSegmentEdges roadSegmentEdges = new RoadSegmentEdges()
                 {
                     left = new Line()
@@ -88,39 +101,58 @@ public class Mesher
             // Process incoming road edges.
             // This meshes any intersection polygons.
             if (incRoadEdges.Length == 1)
-                ProcessRoadEnd(incRoadEdges[0], vertices, faces);
+                ProcessRoadEnd(incRoadEdges[0], vertices, faces, roadMeshEndInfos[0]);
             else if (incRoadEdges.Length > 1)
-                ProcessRoadIntersection(incRoadEdges, vertices, faces);
+                ProcessRoadIntersection(incRoadEdges, vertices, faces, roadMeshEndInfos);
         }
 
         // TODO: Triangulate road segments
-
+        for (int i = 0; i < roadNet.SegmentCount; ++i)
+        {
+            RoadSegmentMeshInfo curSegmentMeshInfo = segmentMeshInfos[i];
+            int botLeftIdx = curSegmentMeshInfo.startVertIndices.leftMeshVertIdx;
+            int topLeftIdx = curSegmentMeshInfo.startVertIndices.rightMeshVertIdx;
+            int topRightIdx = curSegmentMeshInfo.endVertIndices.leftMeshVertIdx;
+            int botRightIdx = curSegmentMeshInfo.endVertIndices.rightMeshVertIdx;
+            faces.Add(new Face(new int[] { botLeftIdx, topLeftIdx, topRightIdx, botLeftIdx, topRightIdx, botRightIdx }));
+        }
 
         return (vertices, faces);
     }
 
-    private static void ProcessRoadEnd(RoadSegmentEdges incRoadEdges, List<Vector3> vertices, List<Face> faces)
+    // Create the vertices for this road end given its incoming edges
+    private static void ProcessRoadEnd(RoadSegmentEdges incRoadEdges, List<Vector3> vertices, List<Face> faces, RoadSegmentMeshEndInfo roadMeshEndInfo)
     {
         vertices.Add(ToVec3(incRoadEdges.left.end));
         vertices.Add(ToVec3(incRoadEdges.right.end));
+
+        // Assign mesh vertices to a road segment
+        roadMeshEndInfo.leftMeshVertIdx = vertices.Count - 2;
+        roadMeshEndInfo.rightMeshVertIdx = vertices.Count - 1;
     }
 
-    private static void ProcessRoadIntersection(RoadSegmentEdges[] incRoadEdges, List <Vector3> vertices, List<Face> faces)
+    // Create the vertices for this intersection given its incoming edges
+    private static void ProcessRoadIntersection(RoadSegmentEdges[] incRoadEdges, List <Vector3> vertices, List<Face> faces, RoadSegmentMeshEndInfo[] roadMeshEndInfos)
     {
         // Perform right vs left road edge intersection in clockwise order.
         // Triangulate the road intersection polygon.
         List<int> intersectionMeshIndices = new List<int>();
         for (int j = 0; j < incRoadEdges.Length; ++j)
         {
-            (bool isIntersect, Vector3 intersection) = WorldLineIntersect(incRoadEdges[j].left, incRoadEdges[(j + 1) % incRoadEdges.Length].right);
+            int nextJ = (j + 1) % incRoadEdges.Length;
+            (bool isIntersect, Vector3 intersection) = WorldLineIntersect(incRoadEdges[j].left, incRoadEdges[nextJ].right);
             if (isIntersect)
             {
                 vertices.Add(intersection);
             }
             else // When parallel
             {
-                vertices.Add(ToVec3(incRoadEdges[j].right.end));
+                vertices.Add(ToVec3(incRoadEdges[j].left.end));
             }
+
+            // Assign new mesh vertex to a road segment
+            roadMeshEndInfos[j].leftMeshVertIdx = vertices.Count - 1;
+            roadMeshEndInfos[nextJ].rightMeshVertIdx = vertices.Count - 1;
 
             if (j >= 2) // Need at least 3 vertices to form a polygon
             {
