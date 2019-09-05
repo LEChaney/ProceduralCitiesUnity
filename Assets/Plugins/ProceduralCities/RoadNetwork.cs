@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.ProBuilder;
+using UnityEngine.ProBuilder.MeshOperations;
 using Random = UnityEngine.Random;
 
 [Serializable]
@@ -139,19 +141,20 @@ public class RoadNetwork : MonoBehaviour
     void Start()
     {
         // De-serialize from json file on play
-        FromJsonOverwrite(inputJsonFile.text);
+        //FromJsonOverwrite(inputJsonFile.text);
 
         // BuildRandom();
 
         // Create line renderers for each segment
-        for (int i = 0; i < SegmentCount; ++i)
-        {
-            Color color = new Color(0, 1.0f, 0);
-            Vector3 offset = new Vector3(0, -0.1f, 0);
-            CreateLineRenderer(GetSegment(i).StartVertex.Position3D + offset, GetSegment(i).EndVertex.Position3D + offset, color);
-        }
+        //for (int i = 0; i < SegmentCount; ++i)
+        //{
+        //    Color color = new Color(0, 1.0f, 0);
+        //    Vector3 offset = new Vector3(0, -0.1f, 0);
+        //    CreateLineRenderer(GetSegment(i).StartVertex.Position3D + offset, GetSegment(i).EndVertex.Position3D + offset, color);
+        //}
 
-        Mesher.MeshRoadNetwork(this);
+        //ProBuilderMesh roadMesh = Mesher.MeshRoadNetwork(this);
+        //roadMesh.GetComponent<MeshRenderer>().sharedMaterial = this.roadMaterial;
     }
 
     // Clears the current road network and builds a random one in its place

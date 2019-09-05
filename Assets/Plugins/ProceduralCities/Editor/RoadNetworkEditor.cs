@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.ProBuilder;
 using System.IO;
 
 [CustomEditor(typeof(RoadNetwork))]
@@ -11,8 +12,6 @@ public class RoadNetworkEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        DrawDefaultInspector();
-
         RoadNetwork roadNetwork = (RoadNetwork)target;
         if (GUILayout.Button("Build Random Road Network"))
         {
@@ -30,5 +29,15 @@ public class RoadNetworkEditor : Editor
         {
             roadNetwork.FromJsonOverwrite(roadNetwork.inputJsonFile.text);
         }
+
+        if (GUILayout.Button("Build Road Mesh"))
+        {
+            ProBuilderMesh roadMesh = Mesher.MeshRoadNetwork(roadNetwork);
+            roadMesh.GetComponent<MeshRenderer>().sharedMaterial = roadNetwork.roadMaterial;
+            roadMesh.transform.position = roadNetwork.transform.position;
+            roadMesh.transform.rotation = roadNetwork.transform.rotation;
+        }
+
+        DrawDefaultInspector();
     }
 }
