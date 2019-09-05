@@ -38,7 +38,7 @@ public class RoadNetwork : MonoBehaviour
     }
 
     // This is run after de-serialization to correctly set backward references from vertices to segments
-    public void FixupReferences()
+    public void RebuildAdjacencies()
     {
         // Clear existing connected segments from all vertices
         for (int i = 0; i < VertCount; ++i)
@@ -52,6 +52,32 @@ public class RoadNetwork : MonoBehaviour
             data.RoadVertices[data.RoadSegments[i].StartVertIndex].ConnectedSegmentIndices.Add(i);
             data.RoadVertices[data.RoadSegments[i].EndVertIndex  ].ConnectedSegmentIndices.Add(i);
         }
+
+        // Sort all segment links in clockwise order
+        for (int i = 0; i < VertCount; ++i)
+        {
+            var roadVert = GetVertex(i);
+            List<int> connSegmentIndices = roadVert.Data.ConnectedSegmentIndices; // Need to operate on index data (this is actually what is stored)
+            connSegmentIndices.Sort(delegate (int conn1Idx, int conn2Idx)
+            {
+                RoadSegmentView conn1 = GetSegment(conn1Idx);
+                RoadSegmentView conn2 = GetSegment(conn2Idx);
+                int adjVertIdx1 = conn1.StartVertex.Index != i ? conn1.StartVertex.Index : conn1.EndVertex.Index;
+                int adjVertIdx2 = conn2.StartVertex.Index != i ? conn2.StartVertex.Index : conn2.EndVertex.Index;
+                RoadVertexView adjVert1 = GetVertex(adjVertIdx1);
+                RoadVertexView adjVert2 = GetVertex(adjVertIdx2);
+                Vector2 vecToAdjVert1 = adjVert1.Position - roadVert.Position;
+                Vector2 VecToAdjVert2 = adjVert2.Position - roadVert.Position;
+                float theta1 = Mathf.PI - Mathf.Atan2(vecToAdjVert1.y, -vecToAdjVert1.x); // [0, 2pi)
+                float theta2 = Mathf.PI - Mathf.Atan2(VecToAdjVert2.y, -VecToAdjVert2.x); // [0, 2pi)
+                if (theta1 < theta2)
+                    return 1;
+                else if (theta1 > theta2)
+                    return -1;
+                else
+                    return 0;
+            });
+        }
     }
 
     public void Clear()
@@ -61,14 +87,41 @@ public class RoadNetwork : MonoBehaviour
 
     public string ToJson(bool prettyPrint = false)
     {
-        return JsonUtility.ToJson(data, prettyPrint);
+        // TODO: Remove this hacky fix for incoming scale / position
+        // move scaling / position correction to python output code
+        foreach (RoadVertex roadVert in data.RoadVertices)
+        {
+            roadVert.position /= 10;
+            roadVert.position += new Vector2(500, 500);
+        }
+
+        string jsonStr = JsonUtility.ToJson(data, prettyPrint);
+
+        // TODO: Remove this hacky fix for incoming scale / position
+        // move scaling / position correction to python output code
+        foreach (RoadVertex roadVert in data.RoadVertices)
+        {
+            roadVert.position -= new Vector2(500, 500);
+            roadVert.position *= 10;
+        }
+
+        return jsonStr;
     }
 
     // Overwrites the current network with one from json data
     public void FromJsonOverwrite(string json)
     {
         data = JsonUtility.FromJson<RoadNetworkData>(json);
-        FixupReferences();
+
+        // TODO: Remove this hacky fix for incoming scale / position
+        // move scaling / position correction to python output code
+        foreach (RoadVertex roadVert in data.RoadVertices)
+        {
+            roadVert.position -= new Vector2(500, 500);
+            roadVert.position *= 10;
+        }
+
+        RebuildAdjacencies();
     }
 
     // Draw simple visualization in editor
@@ -94,8 +147,11 @@ public class RoadNetwork : MonoBehaviour
         for (int i = 0; i < SegmentCount; ++i)
         {
             Color color = new Color(0, 1.0f, 0);
-            CreateLineRenderer(GetSegment(i).StartVertex.Position3D, GetSegment(i).EndVertex.Position3D, color);
+            Vector3 offset = new Vector3(0, -0.1f, 0);
+            CreateLineRenderer(GetSegment(i).StartVertex.Position3D + offset, GetSegment(i).EndVertex.Position3D + offset, color);
         }
+
+        Mesher.MeshRoadNetwork(this);
     }
 
     // Clears the current road network and builds a random one in its place
@@ -116,7 +172,7 @@ public class RoadNetwork : MonoBehaviour
             AddSegment(new RoadSegment(Random.Range(0, NUM_VERTS), Random.Range(0, NUM_VERTS)));
         }
 
-        FixupReferences();
+        RebuildAdjacencies();
     }
 
     private void CreateLineRenderer(Vector3 start, Vector3 end, Color color)
@@ -180,7 +236,12 @@ public class RoadVertexView
 
     public Vector3 Position3D
     {
-        get => new Vector3((Data.Position.x - 500) * 10, 0, (Data.Position.y - 500) * 10);
+        get => new Vector3(Data.position.x, 0, Data.position.y);
+    }
+
+    public Vector2 Position
+    {
+        get => Data.position;
     }
 
     public RoadVertex Data { get; }
@@ -204,9 +265,7 @@ public class RoadVertex
     public List<int> ConnectedSegmentIndices => connectedSegmentIndices;
     private List<int> connectedSegmentIndices = new List<int>();
 
-    [SerializeField]
-    private Vector2 position;
-    public Vector2 Position => position;
+    public Vector2 position;
 
     public RoadVertex()
         : this(new Vector2(0, 0))
@@ -240,6 +299,11 @@ public class RoadSegmentView
         get => roadNetwork.GetVertex(Data.EndVertIndex);
     }
 
+    public float HalfWidth
+    {
+        get => Data.HalfWidth;
+    }
+
     public RoadSegment Data { get; }
 
     // Index in road network graph
@@ -266,13 +330,18 @@ public class RoadSegment
     private int endVertIndex;
     public int EndVertIndex => endVertIndex;
 
+    [SerializeField]
+    private float halfWidth;
+    public float HalfWidth => halfWidth;
+
     public RoadSegment()
         : this(-1, -1)
     { }
 
-    public RoadSegment(int startVertIndex, int endVertIndex)
+    public RoadSegment(int startVertIndex, int endVertIndex, float halfWidth=3.5f)
     {
         this.startVertIndex = startVertIndex;
         this.endVertIndex = endVertIndex;
+        this.halfWidth = halfWidth;
     }
 }

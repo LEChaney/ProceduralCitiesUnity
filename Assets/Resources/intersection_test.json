@@ -11,6 +11,10 @@
     {
       "startVertIndex": 1,
       "endVertIndex": 3
+    },
+    {
+      "startVertIndex": 1,
+      "endVertIndex":  4
     }
   ],
   "roadVertices": [
@@ -35,6 +39,12 @@
     {
       "position": {
         "x": 505,
+        "y": 495
+      }
+    },
+    {
+      "position": {
+        "x": 495,
         "y": 495
       }
     }
