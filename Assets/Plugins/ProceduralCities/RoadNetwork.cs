@@ -94,7 +94,6 @@ public class RoadNetwork : MonoBehaviour
         foreach (RoadVertex roadVert in data.RoadVertices)
         {
             roadVert.position /= 10;
-            roadVert.position += new Vector2(500, 500);
         }
 
         string jsonStr = JsonUtility.ToJson(data, prettyPrint);
@@ -103,7 +102,6 @@ public class RoadNetwork : MonoBehaviour
         // move scaling / position correction to python output code
         foreach (RoadVertex roadVert in data.RoadVertices)
         {
-            roadVert.position -= new Vector2(500, 500);
             roadVert.position *= 10;
         }
 
@@ -119,7 +117,6 @@ public class RoadNetwork : MonoBehaviour
         // move scaling / position correction to python output code
         foreach (RoadVertex roadVert in data.RoadVertices)
         {
-            roadVert.position -= new Vector2(500, 500);
             roadVert.position *= 10;
         }
 

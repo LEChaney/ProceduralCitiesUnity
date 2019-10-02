@@ -11,6 +11,9 @@ public class Mesher
     //    List<int> connectedSegIndices;
     //}
 
+    const float ROAD_Z_OFFSET = 1.0f;
+    const float ROAD_SUBDIVISION_LENGTH = 5.0f; // Length at which to insert extra vertices into the road for terrain conformation
+
     // For each road segment we have two vertices associated with each endpoint
     private class RoadSegmentMeshInfo
     {
@@ -106,15 +109,58 @@ public class Mesher
                 ProcessRoadIntersection(incRoadEdges, vertices, faces, roadMeshEndInfos);
         }
 
-        // TODO: Triangulate road segments
+        // Mesh road segments
+        // (Perspective is top down with road segment going from left to right)
         for (int i = 0; i < roadNet.SegmentCount; ++i)
         {
             RoadSegmentMeshInfo curSegmentMeshInfo = segmentMeshInfos[i];
-            int botLeftIdx = curSegmentMeshInfo.startVertIndices.leftMeshVertIdx;
-            int topLeftIdx = curSegmentMeshInfo.startVertIndices.rightMeshVertIdx;
-            int topRightIdx = curSegmentMeshInfo.endVertIndices.leftMeshVertIdx;
-            int botRightIdx = curSegmentMeshInfo.endVertIndices.rightMeshVertIdx;
+            int boundingBotLeftIdx = curSegmentMeshInfo.startVertIndices.leftMeshVertIdx;
+            int boundingTopLeftIdx = curSegmentMeshInfo.startVertIndices.rightMeshVertIdx;
+            int boundingTopRightIdx = curSegmentMeshInfo.endVertIndices.leftMeshVertIdx;
+            int boundingBotRightIdx = curSegmentMeshInfo.endVertIndices.rightMeshVertIdx;
+
+            // Calc length of road segment
+            Vector3 boundingTopLeftVert = vertices[boundingTopLeftIdx];
+            Vector3 boundingTopRightVert = vertices[boundingTopRightIdx];
+            Vector3 boundingBotLeftVert = vertices[boundingBotLeftIdx];
+            Vector3 boundingBotRightVert = vertices[boundingBotRightIdx];
+            Vector3 segmentVector = boundingTopRightVert - boundingTopLeftVert;
+            Vector3 segmentDir = segmentVector / segmentVector.magnitude;
+            float segLength = segmentVector.magnitude;
+
+            // Add extra vertices along road segment for terrain conformation
+            int numSubSegments = (int)(segLength / ROAD_SUBDIVISION_LENGTH);
+            float subSegmentLength = segLength / numSubSegments;
+            Vector3 subSegmentVector = subSegmentLength * segmentDir;
+            int topLeftIdx = boundingTopLeftIdx;
+            int botLeftIdx = boundingBotLeftIdx;
+            int topRightIdx;
+            int botRightIdx;
+            for (int j = 0; j < numSubSegments; ++j)
+            {
+                // Add new edge vertices and create a face
+                vertices.Add(boundingTopLeftVert + j * subSegmentVector);
+                vertices.Add(boundingBotLeftVert + j * subSegmentVector);
+                topRightIdx = vertices.Count - 2;
+                botRightIdx = vertices.Count - 1;
+                faces.Add(new Face(new int[] { botLeftIdx, topLeftIdx, topRightIdx, botLeftIdx, topRightIdx, botRightIdx }));
+
+                topLeftIdx = topRightIdx;
+                botLeftIdx = botRightIdx;
+            }
+
+            // Add face for last sub-segment
+            topRightIdx = boundingTopRightIdx;
+            botRightIdx = boundingBotRightIdx;
             faces.Add(new Face(new int[] { botLeftIdx, topLeftIdx, topRightIdx, botLeftIdx, topRightIdx, botRightIdx }));
+        }
+
+        // Conform vertices to terrain
+        for (int i = 0; i < vertices.Count; ++i)
+        {
+            Vector3 vertex = vertices[i];
+            vertex.y = Terrain.activeTerrain.SampleHeight(vertices[i]) + ROAD_Z_OFFSET;
+            vertices[i] = vertex;
         }
 
         return (vertices, faces);
@@ -123,8 +169,10 @@ public class Mesher
     // Create the vertices for this road end given its incoming edges
     private static void ProcessRoadEnd(RoadSegmentEdges incRoadEdges, List<Vector3> vertices, List<Face> faces, RoadSegmentMeshEndInfo roadMeshEndInfo)
     {
-        vertices.Add(ToVec3(incRoadEdges.left.end));
-        vertices.Add(ToVec3(incRoadEdges.right.end));
+        Vector3 v1 = ToVec3(incRoadEdges.left.end);
+        Vector3 v2 = ToVec3(incRoadEdges.right.end);
+        vertices.Add(v1);
+        vertices.Add(v2);
 
         // Assign mesh vertices to a road segment
         roadMeshEndInfo.leftMeshVertIdx = vertices.Count - 2;
@@ -143,11 +191,13 @@ public class Mesher
             (bool isIntersect, Vector3 intersection) = WorldLineIntersect(incRoadEdges[j].left, incRoadEdges[nextJ].right);
             if (isIntersect)
             {
-                vertices.Add(intersection);
+                Vector3 v = ToVec3(intersection);
+                vertices.Add(v);
             }
             else // When parallel
             {
-                vertices.Add(ToVec3(incRoadEdges[j].left.end));
+                Vector3 v = ToVec3(incRoadEdges[j].left.end);
+                vertices.Add(v);
             }
 
             // Assign new mesh vertex to a road segment
@@ -175,7 +225,7 @@ public class Mesher
 
     // Intersects two infinite 2D lines.
     // Returns success or failure and the world space intersection point (y axis set to 0).
-    private static (bool, Vector3) WorldLineIntersect(Line line1, Line line2)
+    private static (bool, Vector2) WorldLineIntersect(Line line1, Line line2)
     {
         bool isIntersection = false;
         Vector3 intersection = new Vector3(0, 0, 0);
@@ -197,7 +247,7 @@ public class Mesher
             float u_a = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denominator;
             float u_b = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denominator;
 
-            intersection = ToVec3(p1 + u_a * (p2 - p1));
+            intersection = p1 + u_a * (p2 - p1);
         }
 
         return (isIntersection, intersection);
