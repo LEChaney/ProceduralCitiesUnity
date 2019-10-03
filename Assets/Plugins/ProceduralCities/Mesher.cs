@@ -44,6 +44,7 @@ public class Mesher
     {
         var (vertices, faces) = CalcVerticesAndFaces(roadNet);
         ProBuilderMesh roadMesh = ProBuilderMesh.Create(vertices, faces);
+        roadMesh.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
         return roadMesh;
     }
@@ -136,7 +137,7 @@ public class Mesher
             int botLeftIdx = boundingBotLeftIdx;
             int topRightIdx;
             int botRightIdx;
-            for (int j = 0; j < numSubSegments; ++j)
+            for (int j = 1; j < numSubSegments; ++j)
             {
                 // Add new edge vertices and create a face
                 vertices.Add(boundingTopLeftVert + j * subSegmentVector);
