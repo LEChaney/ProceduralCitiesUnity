@@ -22,6 +22,9 @@ public class Point
         z = b;
         mark = c;
     }
+    public Point()
+    {
+    }
 
     public static Point Makepoint(float a, float b, int c)
     {
