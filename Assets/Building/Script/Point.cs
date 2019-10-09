@@ -25,12 +25,6 @@ public class Point
     public Point()
     {
     }
-
-    public static Point Makepoint(float a, float b, int c)
-    {
-        Point p = new Point(a, b, c);
-        return p;
-    }
     void Start()
     {
         

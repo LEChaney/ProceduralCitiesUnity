@@ -17,11 +17,11 @@ public class Genareate : MonoBehaviour
     public Vector3[] BoundaryPoints;
     List<Transform> buliding1 =new List<Transform>();
     //public Vector3[] SmallPolygon;
-    List <Vector2> SmallPolygon=new List<Vector2>();
+    List <Point> SmallPolygon=new List<Point>();
     public Transform pointPrefab;
     public Transform[] Building;
     public Transform test;
-    List<Vector2> NVector = new List<Vector2>();
+   // List<Vector2> NVector = new List<Vector2>();
 
     List<Point> Points = new List<Point>();
 
@@ -87,6 +87,22 @@ public class Genareate : MonoBehaviour
         }
     }
 
+    private void ShowPoint(Point p)
+    {
+        Vector3 vector3 = new Vector3();
+
+        vector3.y = 72f;
+
+        
+            Transform point = Instantiate(test);
+            point.SetParent(transform, false);
+
+            vector3.x = p.x + terrainData.bounds.extents.x;
+            vector3.z = p.z + terrainData.bounds.extents.z;
+
+            point.localPosition = vector3;
+        
+    }
     private void Divide(List<Point> p)
     {        
         for (int i=0; i<p.Count; i++)
@@ -266,7 +282,7 @@ public class Genareate : MonoBehaviour
         //Last point
         if (p[p.Count-1].z == p[0].z && p[p.Count-2].z == p[p.Count - 1].z)
         {
-            p[0].mark = 8;
+            p[p.Count - 1].mark = 8;
         }
         else
         if (p[p.Count - 1].z == p[0].z || p[p.Count - 2].z == p[p.Count - 1].z)
@@ -279,7 +295,7 @@ public class Genareate : MonoBehaviour
             slope2 = (p[0].x - p[p.Count-1].x) / (p[0].z - p[p.Count-1].z);
             if (slope1 == slope2)
             {
-                p[0].mark = 8;
+                p[p.Count - 1].mark = 8;
             }
         }
         for (int i = 0; i < p.Count; i++)
@@ -350,59 +366,146 @@ public class Genareate : MonoBehaviour
             Debug.Log("<color=red> Import Data Fail </color>");
     }
 
-    void shrink(List<Point> p, float distance)
+    void Shrink(List<Point> p, string property)
     {
         //First point;
 
-        NVector.Add((PointToVector2(p[0]) - PointToVector2(p[p.Count - 1])).normalized);
+        float Distance;
+        float Scale=0;
 
-        for (int i = 1; i < p.Count ; i++)
-        {
-            NVector.Add((PointToVector2(p[i]) - PointToVector2(p[i - 1])).normalized);
-        }
-        Vector2 res=new Vector2();
-        float distance1;
-        for(int i = 0; i < p.Count-1; i++)
-        {
-            if (Vector2.Dot(NVector[i], ReverseVector2(NVector[i + 1])) == 1)
+        float x1 = float.MinValue; //max_x
+        float z1 = float.MinValue; //max_z
+        float x2 = float.MaxValue; //min_x 
+        float z2 = float.MaxValue; //min_z
+
+        switch (property)
+        { 
+        case "Industry":
             {
-                Debug.Log("error1");
-                continue;
+                Distance = Building[1].localScale.x / 2 * root2+RoadWigth*root2;
+                break;
             }
-                //Debug.Log("error1");
-               if(Inside_test(p[i], Polygon, i))
-                {
-                Debug.Log("x " + p[i].x + " z " + p[i].z + " jieguo " + Inside_test(p[i], Polygon, i));
-                    distance1 = distance / Mathf.Sin(0.5f*Vector2.Angle(NVector[i], ReverseVector2(NVector[i + 1])));
-                    res=(ReverseVector2(NVector[i])+NVector[i+1])*distance1;
-                    SmallPolygon.Add(PointToVector2(p[i]) + res);
-                }
-               else
-                {
-                Debug.Log("x " + p[i].x + " z " + p[i].z + " jieguo " + Inside_test(p[i], Polygon, i));
-                distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[i], ReverseVector2(NVector[i + 1])));
-                    res = (NVector[i] + ReverseVector2(NVector[i + 1])) * distance1;
-                    SmallPolygon.Add(PointToVector2(p[i]) + res);
-                }
-                    
+
+
+        case "Commercial":
+            {
+                Distance = Building[2].localScale.x / 2 * root2 + RoadWigth * root2;
+                break;
+            }
+
+        case "Residential":
+            {
+                Distance = Building[0].localScale.x / 2 * root2 + RoadWigth * root2;
+                break;
+            }
+
+        default:
+            {
+                Debug.Log("No property, No shrink");
+                return;
+            }
+
+        }
+
+        for (int i = 0; i < p.Count; i++)
+        {
+            if (p[i].x > x1)
+            {
+                x1 = p[i].x;
+            }
+
+            if (p[i].z > z1)
+            {
+                z1 = p[i].z;
+            }
+
+            if (p[i].x < x2)
+            {
+                x2 = p[i].x;
+            }
+
+            if (p[i].z < z2)
+            {
+                z2 = p[i].z;
+            }
+        }
+
+        Point middlepoint = new Point(x2+(x1-x2)/2,z2+(z1-z2)/2,0);
+
+        ShowPoint(middlepoint);
+
+        for(int i=0;i<p.Count;i++)
+        {
+            float length=Mathf.Sqrt((p[i].x-middlepoint.x)* (p[i].x - middlepoint.x)+(p[i].z - middlepoint.z)* (p[i].z - middlepoint.z));
+            if (length <= Distance)
+            {
+                Debug.Log("not enough");
+                return;
+            }
+
+            float NewScale = Distance / length;
+
+            if (NewScale>Scale)
+            {
+                Scale = Distance / length;
+            }
+
+            Scale = Distance / length;
+            float x = middlepoint.x + (p[i].x - middlepoint.x) * (1-Scale);
+            float z = middlepoint.z + (p[i].z - middlepoint.z) * (1-Scale);
+            Point point = new Point(x, z, 0);
+            SmallPolygon.Add(point);
             
         }
+        //NVector.Add((PointToVector2(p[0]) - PointToVector2(p[p.Count - 1])).normalized);
 
-        if (Vector2.Dot(NVector[p.Count-1], ReverseVector2(NVector[0])) != 0)
-        {
-            if((Inside_test(p[p.Count-1], Polygon, p.Count-1)))
-            {
-                distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[p.Count-1], ReverseVector2(NVector[0])));
-                res = (ReverseVector2(NVector[p.Count-1]) + NVector[0]) * distance1;
-                SmallPolygon.Add(PointToVector2(p[p.Count-1]) + res);
-            }
-            else
-            {
-                distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[p.Count-1], ReverseVector2(NVector[0])));
-                res = (ReverseVector2(NVector[0]) + NVector[p.Count-1]) * distance1;
-                SmallPolygon.Add(PointToVector2(p[p.Count - 1]) + res);
-            }
-        }
+        //for (int i = 1; i < p.Count ; i++)
+        //{
+        //    NVector.Add((PointToVector2(p[i]) - PointToVector2(p[i - 1])).normalized);
+        //}
+        //Vector2 res=new Vector2();
+        //float distance1;
+        //for(int i = 0; i < p.Count-1; i++)
+        //{
+        //    if (Vector2.Dot(NVector[i], ReverseVector2(NVector[i + 1])) == 1)
+        //    {
+        //        Debug.Log("error1");
+        //        continue;
+        //    }
+        //        //Debug.Log("error1");
+        //       if(Inside_test(p[i], Polygon, i))
+        //        {
+        //        Debug.Log("x " + p[i].x + " z " + p[i].z + " jieguo " + Inside_test(p[i], Polygon, i));
+        //            distance1 = distance / Mathf.Sin(0.5f*Vector2.Angle(NVector[i], ReverseVector2(NVector[i + 1])));
+        //            res=(ReverseVector2(NVector[i])+NVector[i+1])*distance1;
+        //            SmallPolygon.Add(PointToVector2(p[i]) + res);
+        //        }
+        //       else
+        //        {
+        //        Debug.Log("x " + p[i].x + " z " + p[i].z + " jieguo " + Inside_test(p[i], Polygon, i));
+        //        distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[i], ReverseVector2(NVector[i + 1])));
+        //            res = (NVector[i] + ReverseVector2(NVector[i + 1])) * distance1;
+        //            SmallPolygon.Add(PointToVector2(p[i]) + res);
+        //        }
+
+
+        //}
+
+        //if (Vector2.Dot(NVector[p.Count-1], ReverseVector2(NVector[0])) != 0)
+        //{
+        //    if((Inside_test(p[p.Count-1], Polygon, p.Count-1)))
+        //    {
+        //        distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[p.Count-1], ReverseVector2(NVector[0])));
+        //        res = (ReverseVector2(NVector[p.Count-1]) + NVector[0]) * distance1;
+        //        SmallPolygon.Add(PointToVector2(p[p.Count-1]) + res);
+        //    }
+        //    else
+        //    {
+        //        distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[p.Count-1], ReverseVector2(NVector[0])));
+        //        res = (ReverseVector2(NVector[0]) + NVector[p.Count-1]) * distance1;
+        //        SmallPolygon.Add(PointToVector2(p[p.Count - 1]) + res);
+        //    }
+        //}
 
     }
 
@@ -596,11 +699,8 @@ public class Genareate : MonoBehaviour
                 {
                     Debug.Log("No property");
                     return;
-                }
-        
+                }       
         }
-        
-        //return res;
     }
     //input pos : the position of generating building
     //
@@ -615,21 +715,8 @@ public class Genareate : MonoBehaviour
 
         if (terrainData.GetSteepness((p.x + terrainData.bounds.extents.x) / terrainData.size.x, (p.z + terrainData.bounds.extents.z) / terrainData.size.z) > 30f)
         {
-         //   Debug.Log("diyi");
             return false;
         }
-    
-
-        //Debug.Log("jiaodu  " + terrainData.GetSteepness((p.x+ terrainData.bounds.extents.x) / terrainData.size.x, (p.z+ terrainData.bounds.extents.z) / terrainData.size.z));
-        //Debug.Log("gaoshix  " + (p.x + terrainData.bounds.extents.x) / terrainData.size.x);
-      
-        //Debug.Log("feliang2" + terrainData.bounds.extents.x);
-        
-
-
-        //Debug.Log("gaoshiz  " + p.z + terrainData.bounds.extents.z);
-       
-        //Debug.Log("diLiu");
         return true;
     }
 
@@ -652,7 +739,7 @@ public class Genareate : MonoBehaviour
         {
             for (int i = 0; i < b.Count; i++)
             {
-                if ((Mathf.Abs(b[i].localPosition.z - (p.z+ terrainData.bounds.extents.z)) < (b[i].localScale.z*root2+building.localScale.z*root2)) && (Mathf.Abs(b[i].localPosition.x - (p.x+ terrainData.bounds.extents.x))) < (b[i].localScale.x * root2 + building.localScale.x * root2))
+                if ((Mathf.Abs(b[i].localPosition.z - (p.z+ terrainData.bounds.extents.z)) < (b[i].localScale.z/2*root2+building.localScale.z/2*root2)) && (Mathf.Abs(b[i].localPosition.x - (p.x+ terrainData.bounds.extents.x))) < (b[i].localScale.x/2 * root2 + building.localScale.x/2 * root2))
                 {
                     return false;
                 }
@@ -829,12 +916,12 @@ public class Genareate : MonoBehaviour
 
         CleanUnnecessaryPoints(Polygon);
 
-        ShowPointPolygon(Polygon);
-       
-      //  shrink(Polygon, 1.2f);
+         ShowPointPolygon(Polygon);
+        
+        Shrink(Polygon, property);
+
         Debug.Log(" //////////////////////loadtest////////////////////////");
         //LoadSmallPolygon(SmallPolygon);
-
         for (int i = 0; i < SmallPolygon.Count; i++)
         {
             if (SmallPolygon[i].x > max_x)
@@ -842,9 +929,9 @@ public class Genareate : MonoBehaviour
                 max_x = SmallPolygon[i].x;
             }
 
-            if (SmallPolygon[i].y > max_z)
+            if (SmallPolygon[i].z > max_z)
             {
-                max_z = SmallPolygon[i].y;
+                max_z = SmallPolygon[i].z;
             }
 
             if (SmallPolygon[i].x < min_x)
@@ -852,17 +939,20 @@ public class Genareate : MonoBehaviour
                 min_x = SmallPolygon[i].x;
             }
 
-            if (SmallPolygon[i].y < min_z)
+            if (SmallPolygon[i].z < min_z)
             {
-                min_z = SmallPolygon[i].y;
+                min_z = SmallPolygon[i].z;
             }
         }
-       max_x = 4;
-       min_x = -4;
-       max_z = 9;
-       min_z = -9;
+
+
+        //max_x = 4;
+        //min_x = -4;
+        //max_z = 9;
+        //min_z = -9;
         ////StartCoroutine(CreateChildren());
-      //  BuildingGeneration(max_x, max_z, min_x, min_z, Polygon, property,Density,Population);
+        BuildingGeneration(max_x, max_z, min_x, min_z, SmallPolygon, property,Density,Population);
+        ShowPointPolygon(SmallPolygon);
     }
 
    
@@ -904,13 +994,13 @@ public class Genareate : MonoBehaviour
 
             if (Inside_test(res1, p))
             {
-                //  Debug.Log("error2");
+                
                 Transform Buildings = Instantiate(test);
-                //  Transform Buildings = Instantiate(test);
+                
                 Buildings.SetParent(transform, false);
                 Buildings.localPosition = OnMap(res);
                 buliding1.Add(Buildings);
-               // index++;
+               
             }
         
     }
