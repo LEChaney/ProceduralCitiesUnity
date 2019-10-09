@@ -209,7 +209,7 @@ public class Genareate : MonoBehaviour
         }
     }
 
-    private void CleanUnessaryPoints(List<Point> p)
+    private void CleanUnnecessaryPoints(List<Point> p)
     {
         float slope1;
         float slope2;
@@ -240,11 +240,13 @@ public class Genareate : MonoBehaviour
             if (p[i].z == p[i-1].z && p[i].z == p[i+1].z)
             {
                 p[i].mark = 8;
+               // Debug.Log("error 3: " + p[i].x + " " + p[i].z);
             }
             else
             if (p[i].z == p[i-1].z || p[i].z == p[i+1].z)
             {
                 // make sure divisor does not equal to 0
+                //Debug.Log("error 2: " + p[i].x + " " + p[i].z);
             }
             else
             {
@@ -254,9 +256,9 @@ public class Genareate : MonoBehaviour
                 
                 if (slope1 == slope2)
                 {
-
-                    Debug.Log("slope1: " + slope1 + " slope2 :" + slope2);
-                    p[0].mark = 8;
+                    //Debug.Log("slope1: " + slope1 + " slope2 :" + slope2);
+                  //  Debug.Log("error 1: " + p[i].x + " " + p[i].z);
+                    p[i].mark = 8;
                 }
             }
         }
@@ -644,7 +646,6 @@ public class Genareate : MonoBehaviour
         if (b.Count==0)
         {
 
-         //   Debug.Log("error1");
             return true;
         }
         else
@@ -653,13 +654,9 @@ public class Genareate : MonoBehaviour
             {
                 if ((Mathf.Abs(b[i].localPosition.z - (p.z+ terrainData.bounds.extents.z)) < (b[i].localScale.z*root2+building.localScale.z*root2)) && (Mathf.Abs(b[i].localPosition.x - (p.x+ terrainData.bounds.extents.x))) < (b[i].localScale.x * root2 + building.localScale.x * root2))
                 {
-              //      Debug.Log("The locaposition is :"+ b[i].localPosition.x+" and "+b[i].localPosition.z);
                     return false;
                 }
-             //   Debug.Log("The locaposition is :" + b[i].localPosition.x + " and " + b[i].localPosition.z);
-              //  Debug.Log("The position is :" + (p.z + terrainData.bounds.extents.z) + " and " + (p.z + terrainData.bounds.extents.z));
-            }
-             
+            }   
         }
         return true;
     }
@@ -830,9 +827,9 @@ public class Genareate : MonoBehaviour
 
         CleanDuplicate(Polygon);
 
-        CleanUnessaryPoints(Polygon);
+        CleanUnnecessaryPoints(Polygon);
 
-      //  ShowPointPolygon(Polygon);
+        ShowPointPolygon(Polygon);
        
       //  shrink(Polygon, 1.2f);
         Debug.Log(" //////////////////////loadtest////////////////////////");
@@ -865,7 +862,7 @@ public class Genareate : MonoBehaviour
        max_z = 9;
        min_z = -9;
         ////StartCoroutine(CreateChildren());
-        BuildingGeneration(max_x, max_z, min_x, min_z, Polygon, property,Density,Population);
+      //  BuildingGeneration(max_x, max_z, min_x, min_z, Polygon, property,Density,Population);
     }
 
    
