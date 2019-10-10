@@ -517,7 +517,17 @@ public class Genareate : MonoBehaviour
         int app = 0;
         bool flag =false;
         int seed;
-        int num = (int)(population/50)+1;
+        int num=0;
+        if (population<100)
+         num= (int)(population/30)+1;
+        else 
+            if (population < 1000)
+            num = (int)(population /250) + 1;
+        else
+            if (population < 2000)
+            num = (int)(population / 400) + 1;
+        else
+            num = (int)(population / 700) + 1;
         Vector3 pos = new Vector3();
         Point pos1 = new Point();
         
@@ -527,7 +537,7 @@ public class Genareate : MonoBehaviour
                 {
                 case "industry":
                     {
-                    Debug.Log("yse industry");
+                  //  Debug.Log("yse industry");
                         for (int index = 0; index < num;)
                       {
                         
@@ -584,8 +594,8 @@ public class Genareate : MonoBehaviour
                             pos1.z = pos.z;
 
                             seed = UnityEngine.Random.Range(0, 99);
-
-                            if (seed <= 19)
+                        
+                             if (seed < (19 + (density - 0.003) / 0.032) * 500)
                             {
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[2]) && Minor_test(pos1, Minor, Building[2]) && Slope_test(pos1))
                                 {
@@ -618,12 +628,9 @@ public class Genareate : MonoBehaviour
                 break;
             case "residential":
                 {
-                    Debug.Log("yse res");
+                  
                     for (int index = 0; index < num;)
-                    {
-                        Debug.Log(" sha?" + app);
-
-                        
+                    {        
                         while (!flag)
                         {
                             app++;
@@ -641,9 +648,10 @@ public class Genareate : MonoBehaviour
                             pos1.z = pos.z;
 
                             seed = UnityEngine.Random.Range(0, 99);
-
-                            if (seed <= 19)
-                            {
+                           
+                            if (seed < (11+(density-0.003)/0.032*300))
+                                {
+                              
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Minor_test(pos1, Minor, Building[3]) && Slope_test(pos1))
                                 {
                                     flag = true;
@@ -654,8 +662,10 @@ public class Genareate : MonoBehaviour
                                 }
                             }
                             else
-                            if (seed <= 79)
+                            
+                             if (seed < (79 - ((density - 0.003) / 0.032) *300))
                             {
+                              
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[0]) && Minor_test(pos1, Minor, Building[0]) && Slope_test(pos1))
                                 {
                                     flag = true;
@@ -670,6 +680,7 @@ public class Genareate : MonoBehaviour
                             {
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[4]) && Minor_test(pos1, Minor, Building[4]) && Slope_test(pos1))
                                 {
+                                    Debug.Log("seed3 :" + seed);
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[4]);
                                     Buildings.SetParent(transform, false);
@@ -912,7 +923,7 @@ public class Genareate : MonoBehaviour
         Shrink(Polygon, property);
         
 
-        Debug.Log(" //////////////////////loadtest////////////////////////");
+ //       Debug.Log(" //////////////////////loadtest////////////////////////");
         //LoadSmallPolygon(SmallPolygon);
         for (int i = 0; i < SmallPolygon.Count; i++)
         {
