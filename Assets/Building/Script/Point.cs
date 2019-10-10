@@ -1,13 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class Point
 {
     // Start is called before the first frame update
-
+    [SerializeField]
     public float x;
+
+    [SerializeField]
     public float z;
+
+    [SerializeField]
     public int mark;
 
     //0 : default

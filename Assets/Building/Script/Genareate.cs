@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,28 +12,37 @@ public class Genareate : MonoBehaviour
     
     public TerrainData terrainData;
 
+    public TextAsset inputJsonFile;
+
     public string property;
 
-    public Vector3[] BoundaryPoints;
+    //public Vector3[] BoundaryPoints;
+
+    public LandUseData LandData;
+
     List<Transform> buliding1 =new List<Transform>();
-    //public Vector3[] SmallPolygon;
+    
     List <Point> SmallPolygon=new List<Point>();
+
     public Transform pointPrefab;
+
     public Transform[] Building;
+
     public Transform test;
    // List<Vector2> NVector = new List<Vector2>();
 
     List<Point> Points = new List<Point>();
 
     List<Point> Polygon = new List<Point>();
+
     List<Point> Minor = new List<Point>();
 
-    List<Vector2> InsideBuildings;
+    //List<Vector2> InsideBuildings;
 
-    [Range(1, 10000)]
-    public int Population = 1000;
+   
+    public float Population;
 
-    public float Density = 0.1f;
+    public float Density;
 
     float max_x = float.MinValue;
     float max_z = float.MinValue;
@@ -52,22 +61,22 @@ public class Genareate : MonoBehaviour
 
    
 
-    private Vector2 PointToVector2(Point pos)
-    {
-        Vector2 a=new Vector2();
-        a.x = pos.x;
-        a.y = pos.z;
-        return a;
-    }
+    //private Vector2 PointToVector2(Point pos)
+    //{
+    //    Vector2 a=new Vector2();
+    //    a.x = pos.x;
+    //    a.y = pos.z;
+    //    return a;
+    //}
 
-    Vector2 ReverseVector2(Vector2 a)
-    {
-        Vector2 b = new Vector2();
-        b.x = -a.x;
-        b.y = -a.y;
-        return b;
+    //Vector2 ReverseVector2(Vector2 a)
+    //{
+    //    Vector2 b = new Vector2();
+    //    b.x = -a.x;
+    //    b.y = -a.y;
+    //    return b;
         
-    }
+    //}
 
     private void ShowPointPolygon(List<Point> p)
     {
@@ -165,20 +174,14 @@ public class Genareate : MonoBehaviour
                 p[i].mark = 1;
                 i++;
                 p[i].mark = 6;
-                if(p[55].mark==6)
-                {
-                 //   Debug.Log("error1");
-                }
-                //find the points on the 
+            
+            
             }
             else
                 if (sum == 3 && p[i].mark == 2)
             {
                 p[i].mark = 6;
-                if (p[55].mark == 6)
-                {
-                  //  Debug.Log("error2");
-                }
+            
             }
             else
                 if (sum == 2)
@@ -339,16 +342,11 @@ public class Genareate : MonoBehaviour
             return false;
     }
 
-    private void Import(Vector3[] p)
+    private void Import(string path)
     {
-
-        if (p != null)
-        {
-            BoundaryPoints = p;
+            LandData = JsonUtility.FromJson<LandUseData>(path);
+           
             Debug.Log("<color=green> Import Data Success </color>");
-        }
-        else
-            Debug.Log("<color=red> Import Data Fail </color>");
     }
 
 
@@ -373,68 +371,58 @@ public class Genareate : MonoBehaviour
         float Distance;
         float Scale=0;
 
-        float x1 = float.MinValue; //max_x
-        float z1 = float.MinValue; //max_z
-        float x2 = float.MaxValue; //min_x 
-        float z2 = float.MaxValue; //min_z
-
         switch (property)
         { 
-        case "Industry":
+        case "industry":
             {
                 Distance = Building[1].localScale.x / 2 * root2+RoadWigth*root2;
-                break;
+               
             }
+                break;
 
 
-        case "Commercial":
+            case "commercial":
+
             {
                 Distance = Building[2].localScale.x / 2 * root2 + RoadWigth * root2;
-                break;
+                
             }
+                break;
 
-        case "Residential":
+            case "residential":
             {
                 Distance = Building[0].localScale.x / 2 * root2 + RoadWigth * root2;
-                break;
+                
             }
+                break;
 
-        default:
+            default:
             {
                 Debug.Log("No property, No shrink");
+                
+            }
                 return;
-            }
 
         }
 
-        for (int i = 0; i < p.Count; i++)
+        float sumx=0;
+        float sumz=0;
+
+        for (int i=0;i<p.Count;i++)
         {
-            if (p[i].x > x1)
-            {
-                x1 = p[i].x;
-            }
-
-            if (p[i].z > z1)
-            {
-                z1 = p[i].z;
-            }
-
-            if (p[i].x < x2)
-            {
-                x2 = p[i].x;
-            }
-
-            if (p[i].z < z2)
-            {
-                z2 = p[i].z;
-            }
+            sumx += p[i].x;
+            sumz += p[i].z;
         }
 
-        Point middlepoint = new Point(x2+(x1-x2)/2,z2+(z1-z2)/2,0);
 
-        ShowPoint(middlepoint);
 
-        for(int i=0;i<p.Count;i++)
+        Point middlepoint = new Point();
+        middlepoint.x = sumx / p.Count;
+        middlepoint.z = sumz / p.Count;
+
+        //ShowPoint(middlepoint);
+
+        for (int i=0;i<p.Count;i++)
         {
             float length=Mathf.Sqrt((p[i].x-middlepoint.x)* (p[i].x - middlepoint.x)+(p[i].z - middlepoint.z)* (p[i].z - middlepoint.z));
             if (length <= Distance)
@@ -524,12 +512,12 @@ public class Genareate : MonoBehaviour
 
     }
 
-    void BuildingGeneration(float max_x, float max_z,float min_x, float min_z, List<Point> p, string pro, float density, int population)
+    void BuildingGeneration(float max_x, float max_z,float min_x, float min_z, List<Point> p, string pro, float density, float population)
     {
         int app = 0;
         bool flag =false;
         int seed;
-        int num = (int)(population / 100);
+        int num = (int)(population/50)+1;
         Vector3 pos = new Vector3();
         Point pos1 = new Point();
         
@@ -537,15 +525,16 @@ public class Genareate : MonoBehaviour
             
                 switch (pro)
                 {
-                case "Industry":
+                case "industry":
                     {
+                    Debug.Log("yse industry");
                         for (int index = 0; index < num;)
                       {
                         
                         while (!flag)
                         {
                             app++;
-                            if (app > 10000)
+                            if (app > 1000)
                             {
                                 Debug.Log("Too much buildings");
                                 return;
@@ -569,11 +558,11 @@ public class Genareate : MonoBehaviour
                         
                         flag = false;
                       }
-                    break;
+                    
                 }
+                break;
 
-
-            case "Commercial":
+            case "commercial":
                 {
                     for (int index = 0; index < num;)
                     {
@@ -581,7 +570,7 @@ public class Genareate : MonoBehaviour
                         while (!flag)
                         {
                             app++;
-                            if (app > 10000)
+                            if (app > 1000)
                             {
                                 Debug.Log("Too much buildings");
                                 return;
@@ -624,11 +613,12 @@ public class Genareate : MonoBehaviour
                         
                         flag = false;
                     }
-                    break;
+                   
                 }
-
-            case "Residential":
+                break;
+            case "residential":
                 {
+                    Debug.Log("yse res");
                     for (int index = 0; index < num;)
                     {
                         Debug.Log(" sha?" + app);
@@ -637,7 +627,7 @@ public class Genareate : MonoBehaviour
                         while (!flag)
                         {
                             app++;
-                            if (app > 10000)
+                            if (app > 1000)
                             {
                                 Debug.Log("Too much buildings");
                                 return;
@@ -692,14 +682,15 @@ public class Genareate : MonoBehaviour
 
                         flag = false;
                     }
-                    break;
+                    
                 }
-
-                  default:
+                break;
+            default:
                 {
                     Debug.Log("No property");
-                    return;
-                }       
+                  
+                }
+                return;
         }
     }
     //input pos : the position of generating building
@@ -711,7 +702,7 @@ public class Genareate : MonoBehaviour
 
     private bool Slope_test(Point p)
     {
-        Debug.Log("error111");
+       // Debug.Log("error111");
 
         if (terrainData.GetSteepness((p.x + terrainData.bounds.extents.x) / terrainData.size.x, (p.z + terrainData.bounds.extents.z) / terrainData.size.z) > 30f)
         {
@@ -902,9 +893,9 @@ public class Genareate : MonoBehaviour
 
     void BuildingPlacement()
     {
-        LoadBoundrary(BoundaryPoints);
+        //LoadBoundrary(BoundaryPoints);
 
-        Import_2(this.GetComponent<Boundary>().Poss);
+        //Import_2(this.GetComponent<Boundary>().Poss);
 
         Divide(Points);
 
@@ -915,10 +906,11 @@ public class Genareate : MonoBehaviour
         CleanDuplicate(Polygon);
 
         CleanUnnecessaryPoints(Polygon);
-
-         ShowPointPolygon(Polygon);
+       //F Debug.Log("finish clean");
+        //ShowPointPolygon(Polygon);
         
         Shrink(Polygon, property);
+        
 
         Debug.Log(" //////////////////////loadtest////////////////////////");
         //LoadSmallPolygon(SmallPolygon);
@@ -952,24 +944,58 @@ public class Genareate : MonoBehaviour
         //min_z = -9;
         ////StartCoroutine(CreateChildren());
         BuildingGeneration(max_x, max_z, min_x, min_z, SmallPolygon, property,Density,Population);
-        ShowPointPolygon(SmallPolygon);
+       // Debug.Log("finish placement");
+        //ShowPointPolygon(SmallPolygon);
     }
 
    
 
     private void Awake()
     {
-        Import(this.GetComponent<Boundary>().Poss);
-
-       
+        Import(inputJsonFile.text);  
     }
 
     void Start()
     {
-      BuildingPlacement();
+       // Debug.Log("start" + LandData.Landuse.Count);     
+        
+        for(int i=0; i<LandData.Landuse.Count;i++)
+        {
+
+            property = LandData.Landuse[i].Land_usage;
+            //Debug.Log("type :" + property);
+
+            //Debug.Log("index :" + i);
+            if (property == "none")
+            {
+                continue;
+            }
+
+            Points= LandData.Landuse[i].Polygon;
+           // Debug.Log("read list");
+         
+            Population = LandData.Landuse[i].Population;
+            Density = LandData.Landuse[i].Population_density;
+            BuildingPlacement();
+            Clean();
+        }
+       
     }
 
-   
+    private void Clean()
+    {
+        buliding1.Clear();
+
+        SmallPolygon.Clear();
+
+        Points.Clear();
+
+        Polygon.Clear();
+
+        Minor.Clear(); 
+    }
+
+
 
 
     // Update is called once per frame
