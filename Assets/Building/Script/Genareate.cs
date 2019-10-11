@@ -430,15 +430,15 @@ public class Genareate : MonoBehaviour
         int seed;
         int num=0;
         if (population<100)
-         num= (int)(population/30)+1;
+         num= (int)(population/10)+1;
         else 
             if (population < 1000)
-            num = (int)(population /250) + 1;
+            num = (int)(population /50) + 1;
         else
             if (population < 2000)
-            num = (int)(population / 400) + 1;
+            num = (int)(population / 80) + 1;
         else
-            num = (int)(population / 700) + 1;
+            num = (int)(population / 140) + 1;
         Vector3 pos = new Vector3();
         Point pos1 = new Point();
         
@@ -575,7 +575,7 @@ public class Genareate : MonoBehaviour
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[3]);
-                                    Buildings.localScale *= 100;
+                                    //Buildings.localScale *= 100;
                                     Buildings.SetParent(transform, false);
                                     Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
@@ -643,7 +643,7 @@ public class Genareate : MonoBehaviour
 
     private bool Slope_test(Point p)
     {
-        if (terrainData.GetSteepness((ConvertCo(p).x) / terrainData.size.x, (ConvertCo(p).z + terrainData.bounds.extents.z) / terrainData.size.z) > 30f)
+        if (terrainData.GetSteepness((ConvertCo(p).x) / terrainData.size.x, (ConvertCo(p).z) / terrainData.size.z) > 30f)
         {
             return false;
         }
@@ -701,46 +701,7 @@ public class Genareate : MonoBehaviour
         return true;
     }
 
-    private void LoadBoundrary(Vector3[] points)
-    {
-        if (points.Length == 0)
-        {
-            Debug.Log("<color=red> Boundary Load Fail </color>");
-        }
-        else
-        {
-            for (int i = 0; i < points.Length; i++)
-            {
-                Transform point = Instantiate(pointPrefab);
-                point.SetParent(transform, false);
-                point.localPosition = points[i];
-            }
-            Debug.Log("<color=green> Boundary Load Success </color>");
-        }
-    }
-
-    private void LoadSmallPolygon(List<Vector2> v)
-    {
-        if (v.Count == 0)
-        {
-            Debug.Log("<color=red> Small polygon Load Fail </color>");
-        }
-        else
-        {
-            for (int i = 0; i < v.Count; i++)
-            {
-                Transform point = Instantiate(test);
-                point.SetParent(transform, false);
-                Vector3 para = new Vector3();
-                para.x = v[i].x;
-                para.y = 5f;
-                para.z = v[i].y;
-                point.localPosition = para;
-                
-            }
-            Debug.Log("<color=green> Small Polygon Load Success </color>");
-        }
-    }
+   
 
 
     //
