@@ -341,7 +341,7 @@ public class RoadSegment
         : this(-1, -1)
     { }
 
-    public RoadSegment(int startVertIndex, int endVertIndex, float halfWidth=3.5f)
+    public RoadSegment(int startVertIndex, int endVertIndex, float halfWidth=7.0f)
     {
         this.startVertIndex = startVertIndex;
         this.endVertIndex = endVertIndex;
