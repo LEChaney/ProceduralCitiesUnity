@@ -11,8 +11,8 @@ public class Mesher
     //    List<int> connectedSegIndices;
     //}
 
-    const float ROAD_Z_OFFSET = 1.0f;
-    const float ROAD_SUBDIVISION_LENGTH = 5.0f; // Length at which to insert extra vertices into the road for terrain conformation
+    const float ROAD_Z_OFFSET = 10.0f;
+    const float ROAD_SUBDIVISION_LENGTH = 10.0f; // Length at which to insert extra vertices into the road for terrain conformation
 
     // For each road segment we have two vertices associated with each endpoint
     private class RoadSegmentMeshInfo
@@ -137,18 +137,18 @@ public class Mesher
             int botLeftIdx = boundingBotLeftIdx;
             int topRightIdx;
             int botRightIdx;
-            for (int j = 1; j < numSubSegments; ++j)
-            {
-                // Add new edge vertices and create a face
-                vertices.Add(boundingTopLeftVert + j * subSegmentVector);
-                vertices.Add(boundingBotLeftVert + j * subSegmentVector);
-                topRightIdx = vertices.Count - 2;
-                botRightIdx = vertices.Count - 1;
-                faces.Add(new Face(new int[] { botLeftIdx, topLeftIdx, topRightIdx, botLeftIdx, topRightIdx, botRightIdx }));
+            //for (int j = 1; j < numSubSegments; ++j)
+            //{
+            //    // Add new edge vertices and create a face
+            //    vertices.Add(boundingTopLeftVert + j * subSegmentVector);
+            //    vertices.Add(boundingBotLeftVert + j * subSegmentVector);
+            //    topRightIdx = vertices.Count - 2;
+            //    botRightIdx = vertices.Count - 1;
+            //    faces.Add(new Face(new int[] { botLeftIdx, topLeftIdx, topRightIdx, botLeftIdx, topRightIdx, botRightIdx }));
 
-                topLeftIdx = topRightIdx;
-                botLeftIdx = botRightIdx;
-            }
+            //    topLeftIdx = topRightIdx;
+            //    botLeftIdx = botRightIdx;
+            //}
 
             // Add face for last sub-segment
             topRightIdx = boundingTopRightIdx;
@@ -240,8 +240,8 @@ public class Mesher
 
         float denominator = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
 
-        //Make sure the denominator is > 0, if so the lines are parallel
-        if (denominator != 0)
+        // Lines intersect at angle
+        if (Mathf.Abs(denominator) > 0.1)
         {
             isIntersection = true;
 
@@ -249,6 +249,12 @@ public class Mesher
             float u_b = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denominator;
 
             intersection = p1 + u_a * (p2 - p1);
+        }
+        // Lines intersect head on
+        else if ((p2 - p4).magnitude < 0.1)
+        {
+            isIntersection = true;
+            intersection = p2; // End of line
         }
 
         return (isIntersection, intersection);
