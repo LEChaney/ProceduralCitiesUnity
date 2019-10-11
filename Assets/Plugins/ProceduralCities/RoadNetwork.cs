@@ -11,6 +11,8 @@ public class RoadNetwork : MonoBehaviour
 {
     public TextAsset inputJsonFile;
     public Material roadMaterial;
+    public float inputWidth = 872;
+    public float inputHeight = 843;
 
     private RoadNetworkData data = new RoadNetworkData();
 
@@ -117,7 +119,8 @@ public class RoadNetwork : MonoBehaviour
         // move scaling / position correction to python output code
         foreach (RoadVertex roadVert in data.RoadVertices)
         {
-            roadVert.position *= 10;
+            roadVert.position.x *= Terrain.activeTerrain.terrainData.size.x / inputWidth;
+            roadVert.position.y = Terrain.activeTerrain.terrainData.size.z - roadVert.position.y * Terrain.activeTerrain.terrainData.size.z / inputHeight; // Flip y-axis
         }
 
         RebuildAdjacencies();
@@ -163,7 +166,7 @@ public class RoadNetwork : MonoBehaviour
         const int NUM_VERTS = 10000;
         for (int i = 0; i < NUM_VERTS; ++i)
         {
-            AddVertex(new RoadVertex(Random.Range(0, 1000), Random.Range(0, 1000)));
+            AddVertex(new RoadVertex(Random.Range(0, Terrain.activeTerrain.terrainData.size.x), Random.Range(0, Terrain.activeTerrain.terrainData.size.z)));
         }
 
         // Add random connections between vertices
@@ -338,7 +341,7 @@ public class RoadSegment
         : this(-1, -1)
     { }
 
-    public RoadSegment(int startVertIndex, int endVertIndex, float halfWidth=3.5f)
+    public RoadSegment(int startVertIndex, int endVertIndex, float halfWidth=7.0f)
     {
         this.startVertIndex = startVertIndex;
         this.endVertIndex = endVertIndex;
