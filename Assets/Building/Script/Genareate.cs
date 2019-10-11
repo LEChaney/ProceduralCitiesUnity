@@ -16,8 +16,6 @@ public class Genareate : MonoBehaviour
 
     public string property;
 
-    //public Vector3[] BoundaryPoints;
-
     public LandUseData LandData;
 
     List<Transform> buliding1 =new List<Transform>();
@@ -29,7 +27,6 @@ public class Genareate : MonoBehaviour
     public Transform[] Building;
 
     public Transform test;
-   // List<Vector2> NVector = new List<Vector2>();
 
     List<Point> Points = new List<Point>();
 
@@ -37,8 +34,7 @@ public class Genareate : MonoBehaviour
 
     List<Point> Minor = new List<Point>();
 
-    //List<Vector2> InsideBuildings;
-
+    Vector3 ZeroPoint = new Vector3(0,0,0);
    
     public float Population;
 
@@ -49,69 +45,57 @@ public class Genareate : MonoBehaviour
     float min_x = float.MaxValue;
     float min_z = float.MaxValue;
 
-    private Vector3 OnMap(Vector3 pos)
+    private Vector3 ConvertCo(Vector3 v)
     {
         Vector3 vector3 = new Vector3();
-
-        vector3.x = pos.x + terrainData.bounds.extents.x;
-        vector3.z = pos.z + terrainData.bounds.extents.z;
+        vector3.x = 11000 - v.x / 843 * 11000;
+        vector3.y = v.y;
+        vector3.z = 11000 - v.z / 872 * 11000;
 
         return vector3;
     }
 
-   
-
-    //private Vector2 PointToVector2(Point pos)
-    //{
-    //    Vector2 a=new Vector2();
-    //    a.x = pos.x;
-    //    a.y = pos.z;
-    //    return a;
-    //}
-
-    //Vector2 ReverseVector2(Vector2 a)
-    //{
-    //    Vector2 b = new Vector2();
-    //    b.x = -a.x;
-    //    b.y = -a.y;
-    //    return b;
-        
-    //}
-
-    private void ShowPointPolygon(List<Point> p)
+    private Point ConvertCo(Point p)
     {
-        Vector3 vector3 = new Vector3();
+        Point point = new Point();
 
-        vector3.y = 72f;
+        point.x = 11000 - p.x / 843 * 11000;
 
-        for (int i = 0; i < p.Count; i++)
-        {
-            Transform point = Instantiate(test);
-            point.SetParent(transform, false);
+        point.z = 11000 - p.z / 872 * 11000;
 
-            vector3.x = p[i].x + terrainData.bounds.extents.x;
-            vector3.z = p[i].z + terrainData.bounds.extents.z;
-        
-            point.localPosition = vector3;
-        }
+        return point;
     }
 
-    private void ShowPoint(Point p)
-    {
-        Vector3 vector3 = new Vector3();
+    //private Vector3 OnMap(Vector3 pos, Vector3 orign)
+    //{
+    //    Vector3 vector3 = new Vector3();
 
-        vector3.y = 72f;
 
-        
-            Transform point = Instantiate(test);
-            point.SetParent(transform, false);
+    //    vector3.x = pos.x + orign.x;
+    //    vector3.y = pos.y + orign.y;
+    //    vector3.z = pos.z + orign.z;
 
-            vector3.x = p.x + terrainData.bounds.extents.x;
-            vector3.z = p.z + terrainData.bounds.extents.z;
+    //    return vector3;
+    //}
 
-            point.localPosition = vector3;
-        
-    }
+    //private void ShowPointPolygon(List<Point> p)
+    //{
+    //    Vector3 vector3 = new Vector3();
+
+    //    vector3.y = 72f;
+
+    //    for (int i = 0; i < p.Count; i++)
+    //    {
+    //        Transform point = Instantiate(test);
+    //        point.SetParent(transform, false);
+
+    //        vector3.x = p[i].x + terrainData.bounds.extents.x;
+    //        vector3.z = p[i].z + terrainData.bounds.extents.z;
+
+    //        point.localPosition = vector3;
+    //    }
+    //}
+
     private void Divide(List<Point> p)
     {        
         for (int i=0; i<p.Count; i++)
@@ -161,8 +145,6 @@ public class Genareate : MonoBehaviour
        for(int i=1;i<p.Count-1;i++)
         {
             int sum = p[i - 1].mark + p[i + 1].mark;
-
-           // Debug.Log("first" + p[57].mark);
                 if(sum==1||sum==6)
             {
                 p[i].mark = 1;
@@ -210,7 +192,7 @@ public class Genareate : MonoBehaviour
                 p[0].mark = 6;
             }
         }
-      //  Debug.Log("last" + p[55]);
+
     }
 
     private void ReadPolygon(List<Point> p)
@@ -259,13 +241,12 @@ public class Genareate : MonoBehaviour
             if (p[i].z == p[i-1].z && p[i].z == p[i+1].z)
             {
                 p[i].mark = 8;
-               // Debug.Log("error 3: " + p[i].x + " " + p[i].z);
+
             }
             else
             if (p[i].z == p[i-1].z || p[i].z == p[i+1].z)
             {
-                // make sure divisor does not equal to 0
-                //Debug.Log("error 2: " + p[i].x + " " + p[i].z);
+
             }
             else
             {
@@ -275,8 +256,6 @@ public class Genareate : MonoBehaviour
                 
                 if (slope1 == slope2)
                 {
-                    //Debug.Log("slope1: " + slope1 + " slope2 :" + slope2);
-                  //  Debug.Log("error 1: " + p[i].x + " " + p[i].z);
                     p[i].mark = 8;
                 }
             }
@@ -349,21 +328,6 @@ public class Genareate : MonoBehaviour
             Debug.Log("<color=green> Import Data Success </color>");
     }
 
-
-    private void Import_2(Vector3[] p)
-    {
-        if (p != null)
-        {
-            for (int i = 0; i < p.Length; i++)
-            {
-                Points.Add(new Point(p[i].x, p[i].z, 0));   
-            }          
-            Debug.Log("<color=green> Import Data Success </color>");
-        }
-        else
-            Debug.Log("<color=red> Import Data Fail </color>");
-    }
-
     void Shrink(List<Point> p, string property)
     {
         //First point;
@@ -375,7 +339,7 @@ public class Genareate : MonoBehaviour
         { 
         case "industry":
             {
-                Distance = Building[1].localScale.x / 2 * root2+RoadWigth*root2;
+                Distance = Building[1].localScale.x / 2 * root2 + RoadWigth*root2;
                
             }
                 break;
@@ -445,56 +409,6 @@ public class Genareate : MonoBehaviour
             SmallPolygon.Add(point);
             
         }
-        //NVector.Add((PointToVector2(p[0]) - PointToVector2(p[p.Count - 1])).normalized);
-
-        //for (int i = 1; i < p.Count ; i++)
-        //{
-        //    NVector.Add((PointToVector2(p[i]) - PointToVector2(p[i - 1])).normalized);
-        //}
-        //Vector2 res=new Vector2();
-        //float distance1;
-        //for(int i = 0; i < p.Count-1; i++)
-        //{
-        //    if (Vector2.Dot(NVector[i], ReverseVector2(NVector[i + 1])) == 1)
-        //    {
-        //        Debug.Log("error1");
-        //        continue;
-        //    }
-        //        //Debug.Log("error1");
-        //       if(Inside_test(p[i], Polygon, i))
-        //        {
-        //        Debug.Log("x " + p[i].x + " z " + p[i].z + " jieguo " + Inside_test(p[i], Polygon, i));
-        //            distance1 = distance / Mathf.Sin(0.5f*Vector2.Angle(NVector[i], ReverseVector2(NVector[i + 1])));
-        //            res=(ReverseVector2(NVector[i])+NVector[i+1])*distance1;
-        //            SmallPolygon.Add(PointToVector2(p[i]) + res);
-        //        }
-        //       else
-        //        {
-        //        Debug.Log("x " + p[i].x + " z " + p[i].z + " jieguo " + Inside_test(p[i], Polygon, i));
-        //        distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[i], ReverseVector2(NVector[i + 1])));
-        //            res = (NVector[i] + ReverseVector2(NVector[i + 1])) * distance1;
-        //            SmallPolygon.Add(PointToVector2(p[i]) + res);
-        //        }
-
-
-        //}
-
-        //if (Vector2.Dot(NVector[p.Count-1], ReverseVector2(NVector[0])) != 0)
-        //{
-        //    if((Inside_test(p[p.Count-1], Polygon, p.Count-1)))
-        //    {
-        //        distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[p.Count-1], ReverseVector2(NVector[0])));
-        //        res = (ReverseVector2(NVector[p.Count-1]) + NVector[0]) * distance1;
-        //        SmallPolygon.Add(PointToVector2(p[p.Count-1]) + res);
-        //    }
-        //    else
-        //    {
-        //        distance1 = distance / Mathf.Sin(0.5f * Vector2.Angle(NVector[p.Count-1], ReverseVector2(NVector[0])));
-        //        res = (ReverseVector2(NVector[0]) + NVector[p.Count-1]) * distance1;
-        //        SmallPolygon.Add(PointToVector2(p[p.Count - 1]) + res);
-        //    }
-        //}
-
     }
 
     Vector3 GenerateRandomPosition(float max_x, float max_z, float min_x, float min_z)
@@ -507,9 +421,6 @@ public class Genareate : MonoBehaviour
         res.y = 0f;
         res.z = z;
         return res;
-        //res.y = terrainData.GetInterpolatedHeight(((res.x + terrainData.bounds.extents.x) / terrainData.size.x), ((res.z + terrainData.bounds.extents.z) / terrainData.size.z))
-        //    + Building[0].localScale.y / 2 - 0.2f;
-
     }
 
     void BuildingGeneration(float max_x, float max_z,float min_x, float min_z, List<Point> p, string pro, float density, float population)
@@ -531,13 +442,13 @@ public class Genareate : MonoBehaviour
         Vector3 pos = new Vector3();
         Point pos1 = new Point();
         
-           // Point res1 = new Point(res.x, res.z, 0);
+
             
                 switch (pro)
                 {
                 case "industry":
                     {
-                  //  Debug.Log("yse industry");
+
                         for (int index = 0; index < num;)
                       {
                         
@@ -549,8 +460,9 @@ public class Genareate : MonoBehaviour
                                 Debug.Log("Too much buildings");
                                 return;
                             }
-                            pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
-                            pos.y = terrainData.GetInterpolatedHeight(((pos.x + terrainData.bounds.extents.x) / terrainData.size.x), ((pos.z + terrainData.bounds.extents.z) / terrainData.size.z))
+                            Vector3 v= GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                            pos = ConvertCo(v);
+                            pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
                                    + Building[1].localScale.y / 2 - 0.2f;
 
                             pos1.x = pos.x;
@@ -560,7 +472,7 @@ public class Genareate : MonoBehaviour
                                 flag = true;
                                 Transform Buildings = Instantiate(Building[1]);
                                 Buildings.SetParent(transform, false);
-                                Buildings.localPosition = OnMap(pos);
+                                Buildings.localPosition = pos;
                                 buliding1.Add(Buildings);
                                 index++;
                             }
@@ -586,9 +498,8 @@ public class Genareate : MonoBehaviour
                                 return;
                             }
 
-                            pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
-                            pos.y = terrainData.GetInterpolatedHeight(((pos.x + terrainData.bounds.extents.x) / terrainData.size.x), ((pos.z + terrainData.bounds.extents.z) / terrainData.size.z))
-                                   + Building[1].localScale.y / 2 - 0.2f;
+                           
+                          
 
                             pos1.x = pos.x;
                             pos1.z = pos.z;
@@ -597,24 +508,32 @@ public class Genareate : MonoBehaviour
                         
                              if (seed < (19 + (density - 0.003) / 0.032) * 500)
                             {
+                                Vector3 v = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                pos = ConvertCo(v);
+                                pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                       + Building[2].localScale.y / 2 - 0.2f;
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[2]) && Minor_test(pos1, Minor, Building[2]) && Slope_test(pos1))
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[2]);
                                     Buildings.SetParent(transform, false);
-                                    Buildings.localPosition = OnMap(pos);
+                                    Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
                                     index++;
                                 }
                             }
                             else
                             {
+                                Vector3 v = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                pos = ConvertCo(v);
+                                pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                       + Building[3].localScale.y / 2 - 0.2f;
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Minor_test(pos1, Minor, Building[3]) && Slope_test(pos1))
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[3]);
                                     Buildings.SetParent(transform, false);
-                                    Buildings.localPosition = OnMap(pos);
+                                    Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
                                     index++;
                                 }
@@ -640,10 +559,7 @@ public class Genareate : MonoBehaviour
                                 return;
                             }
 
-                            pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
-                            pos.y = terrainData.GetInterpolatedHeight(((pos.x + terrainData.bounds.extents.x) / terrainData.size.x), ((pos.z + terrainData.bounds.extents.z) / terrainData.size.z))
-                                   + Building[1].localScale.y / 2 - 0.2f;
-
+                           
                             pos1.x = pos.x;
                             pos1.z = pos.z;
 
@@ -651,13 +567,17 @@ public class Genareate : MonoBehaviour
                            
                             if (seed < (11+(density-0.003)/0.032*300))
                                 {
-                              
+                                Vector3 v = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                pos = ConvertCo(v);
+                                pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                       + Building[3].localScale.y / 2 - 0.2f;
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Minor_test(pos1, Minor, Building[3]) && Slope_test(pos1))
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[3]);
+                                    Buildings.localScale *= 100;
                                     Buildings.SetParent(transform, false);
-                                    Buildings.localPosition = OnMap(pos);
+                                    Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
                                 }
                             }
@@ -665,26 +585,36 @@ public class Genareate : MonoBehaviour
                             
                              if (seed < (79 - ((density - 0.003) / 0.032) *300))
                             {
-                              
+
+                                Vector3 v = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                pos = ConvertCo(v);
+                                pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                       + Building[0].localScale.y / 2 - 0.2f;
+
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[0]) && Minor_test(pos1, Minor, Building[0]) && Slope_test(pos1))
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[0]);
                                     Buildings.SetParent(transform, false);
-                                    Buildings.localPosition = OnMap(pos);
+                                    Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
                                     index++;
                                 }
                             }
                             else
                             {
+                                Vector3 v = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                pos = ConvertCo(v);
+                                pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                       + Building[4].localScale.y / 2 - 0.2f;
+
                                 if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[4]) && Minor_test(pos1, Minor, Building[4]) && Slope_test(pos1))
                                 {
                                     Debug.Log("seed3 :" + seed);
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[4]);
                                     Buildings.SetParent(transform, false);
-                                    Buildings.localPosition = OnMap(pos);
+                                    Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
                                     index++;
                                 }
@@ -713,9 +643,7 @@ public class Genareate : MonoBehaviour
 
     private bool Slope_test(Point p)
     {
-       // Debug.Log("error111");
-
-        if (terrainData.GetSteepness((p.x + terrainData.bounds.extents.x) / terrainData.size.x, (p.z + terrainData.bounds.extents.z) / terrainData.size.z) > 30f)
+        if (terrainData.GetSteepness((ConvertCo(p).x) / terrainData.size.x, (ConvertCo(p).z + terrainData.bounds.extents.z) / terrainData.size.z) > 30f)
         {
             return false;
         }
@@ -729,9 +657,6 @@ public class Genareate : MonoBehaviour
     //test the deistance between this position and generated buildings. 
     private bool Distance_test(Point p, List<Transform> b, Transform building)
     {
-
-       // Debug.Log("building"+ b.Count);
-
         if (b.Count==0)
         {
 
@@ -741,7 +666,7 @@ public class Genareate : MonoBehaviour
         {
             for (int i = 0; i < b.Count; i++)
             {
-                if ((Mathf.Abs(b[i].localPosition.z - (p.z+ terrainData.bounds.extents.z)) < (b[i].localScale.z/2*root2+building.localScale.z/2*root2)) && (Mathf.Abs(b[i].localPosition.x - (p.x+ terrainData.bounds.extents.x))) < (b[i].localScale.x/2 * root2 + building.localScale.x/2 * root2))
+                if ((Mathf.Abs(b[i].localPosition.z - ConvertCo(p).z) < (b[i].localScale.z/2*root2+building.localScale.z/2*root2)) && (Mathf.Abs(b[i].localPosition.x - (ConvertCo(p).x))) < (b[i].localScale.x/2 * root2 + building.localScale.x/2 * root2))
                 {
                     return false;
                 }
@@ -758,26 +683,18 @@ public class Genareate : MonoBehaviour
 
     private bool Minor_test(Point p, List<Point> b,Transform building)
     {
-
-        // Debug.Log("building"+ b.Count);
-
         if (b.Count == 0)
         {
-
-            //   Debug.Log("error1");
             return true;
         }
         else
         {
             for (int i = 0; i < b.Count; i++)
             {
-                if ((Mathf.Abs(b[i].z - (p.z + terrainData.bounds.extents.z)) < (RoadWigth*root2+building.localScale.z*root2)) && ((Mathf.Abs(b[i].x - (p.x + terrainData.bounds.extents.x))) < (RoadWigth * root2 + building.localScale.z * root2)))
+                if ((Mathf.Abs(b[i].z - (ConvertCo(p).z)) < (RoadWigth*root2+building.localScale.z*root2)) && ((Mathf.Abs(b[i].x - (ConvertCo(p).x + terrainData.bounds.extents.x))) < (RoadWigth * root2 + building.localScale.z * root2)))
                 {
-                  //  Debug.Log("The locaposition is :" + b[i].x + " and " + b[i].z);
                     return false;
                 }
-               // Debug.Log("The locaposition is :" + b[i].x + " and " + b[i].z);
-               // Debug.Log("The position is :" + (p.z + terrainData.bounds.extents.z) + " and " + (p.z + terrainData.bounds.extents.z));
             }
 
         }
@@ -796,7 +713,7 @@ public class Genareate : MonoBehaviour
             {
                 Transform point = Instantiate(pointPrefab);
                 point.SetParent(transform, false);
-                point.localPosition = OnMap(points[i]);
+                point.localPosition = points[i];
             }
             Debug.Log("<color=green> Boundary Load Success </color>");
         }
@@ -818,7 +735,7 @@ public class Genareate : MonoBehaviour
                 para.x = v[i].x;
                 para.y = 5f;
                 para.z = v[i].y;
-                point.localPosition = OnMap(para);
+                point.localPosition = para;
                 
             }
             Debug.Log("<color=green> Small Polygon Load Success </color>");
@@ -843,11 +760,12 @@ public class Genareate : MonoBehaviour
         for (i = 0; i < p.Count;i++)
         {
             app++;
-            if(app>10000)
+            if(app>1000)
             {
                 break;
             }
-            if(p[i].z<a.z&&p[j].z>=a.z||p[j].z<a.z&&p[i].z>=a.z && (p[i].x <= a.x && p[i].x <= a.x))
+
+            if(ConvertCo(p[i]).z<a.z&& ConvertCo(p[j]).z>=a.z|| ConvertCo(p[j]).z<a.z&& ConvertCo(p[i]).z>=a.z )
             {
                 res1 = (a.z - p[i].z) / (p[j].z - p[i].z);
                 res2 = res1 * p[j].x - p[i].x;
@@ -861,38 +779,6 @@ public class Genareate : MonoBehaviour
         return res;
     }
 
-    bool Inside_test(Point a, List<Point> p, int index)
-    {
-        bool res = false;
-
-        int i;
-        int j = p.Count - 1;
-        float res1;
-        float res2;
-        for (i = 0; i < p.Count; i++)
-        {
-            if(i==index)
-            {
-                if (i == p.Count - 1)
-                    break;
-                else
-                    i++;
-            }
-            if (p[i].z < a.z && p[j].z >= a.z || p[j].z < a.z && p[i].z >= a.z &&(p[i].x<=a.x&& p[i].x <= a.x))
-            {
-                res1 = (a.z - p[i].z) / (p[j].z - p[i].z);
-                res2 = res1 * p[j].x - p[i].x;
-                if (res2 < a.x)
-                {
-                    res = !res;
-                }
-            }
-            j = i;
-        }
-
-
-        return res;
-    }
     //private IEnumerator CreateChildren()
     //{
     //    for (int i = 0; i < Num; i++)
@@ -904,10 +790,6 @@ public class Genareate : MonoBehaviour
 
     void BuildingPlacement()
     {
-        //LoadBoundrary(BoundaryPoints);
-
-        //Import_2(this.GetComponent<Boundary>().Poss);
-
         Divide(Points);
 
         ReadPolygon(Points);
@@ -917,14 +799,9 @@ public class Genareate : MonoBehaviour
         CleanDuplicate(Polygon);
 
         CleanUnnecessaryPoints(Polygon);
-       //F Debug.Log("finish clean");
-        //ShowPointPolygon(Polygon);
-        
+     
         Shrink(Polygon, property);
         
-
- //       Debug.Log(" //////////////////////loadtest////////////////////////");
-        //LoadSmallPolygon(SmallPolygon);
         for (int i = 0; i < SmallPolygon.Count; i++)
         {
             if (SmallPolygon[i].x > max_x)
@@ -947,16 +824,8 @@ public class Genareate : MonoBehaviour
                 min_z = SmallPolygon[i].z;
             }
         }
-
-
-        //max_x = 4;
-        //min_x = -4;
-        //max_z = 9;
-        //min_z = -9;
-        ////StartCoroutine(CreateChildren());
         BuildingGeneration(max_x, max_z, min_x, min_z, SmallPolygon, property,Density,Population);
-       // Debug.Log("finish placement");
-        //ShowPointPolygon(SmallPolygon);
+   
     }
 
    
@@ -974,22 +843,21 @@ public class Genareate : MonoBehaviour
         {
 
             property = LandData.Landuse[i].Land_usage;
-            //Debug.Log("type :" + property);
 
-            //Debug.Log("index :" + i);
             if (property == "none")
             {
                 continue;
             }
 
             Points= LandData.Landuse[i].Polygon;
-           // Debug.Log("read list");
          
             Population = LandData.Landuse[i].Population;
             Density = LandData.Landuse[i].Population_density;
             BuildingPlacement();
             Clean();
+            
         }
+        Debug.Log("finish");
        
     }
 
@@ -1016,33 +884,7 @@ public class Genareate : MonoBehaviour
         
     }
 
-    private void Buildingtest(float max_x, float max_z, float min_x, float min_z, int num, List<Point> p)
-    {
-    
-            float x = UnityEngine.Random.Range(min_x, max_x);
-            float z = UnityEngine.Random.Range(min_z, max_z);
-
-            Vector3 res;
-            res.x = x;
-            res.z = z;
-            res.y = 72f;
-
-            Point res1 = new Point(res.x, res.z, 0);
-
-            if (Inside_test(res1, p))
-            {
-                
-                Transform Buildings = Instantiate(test);
-                
-                Buildings.SetParent(transform, false);
-                Buildings.localPosition = OnMap(res);
-                buliding1.Add(Buildings);
-               
-            }
-        
-    }
-
-    
+     
     private void FixedUpdate()
     {
         
