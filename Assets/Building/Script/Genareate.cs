@@ -8,7 +8,7 @@ public class Genareate : MonoBehaviour
     
     float root2 = 1.42f;
 
-    public float RoadWigth = 0.5f;
+    public float RoadWidth = 7f;
     
     public TerrainData terrainData;
 
@@ -205,85 +205,6 @@ public class Genareate : MonoBehaviour
         }
     }
 
-    private void CleanUnnecessaryPoints(List<Point> p)
-    {
-        float slope1;
-        float slope2;
-
-        //first point
-        if(p[0].z == p[1].z && p[0].z == p[p.Count - 1].z)
-        {
-            p[0].mark = 8;
-        }
-        else
-        if(p[0].z == p[1].z || p[0].z == p[p.Count - 1].z)
-        {
-            // make sure divisor does not equal to 0
-        }
-        else    
-        {
-            slope1 = (p[0].x - p[p.Count - 1].x) / (p[0].z - p[p.Count - 1].z);
-            slope2 = (p[1].x - p[0].x) / (p[1].z - p[0].z);
-                if(slope1==slope2)
-            {
-                p[0].mark = 8;
-            }
-        }
-
-        //all points but the first and last
-        for (int i = 1; i < p.Count - 1; i++)
-        {
-            if (p[i].z == p[i-1].z && p[i].z == p[i+1].z)
-            {
-                p[i].mark = 8;
-
-            }
-            else
-            if (p[i].z == p[i-1].z || p[i].z == p[i+1].z)
-            {
-
-            }
-            else
-            {
-                slope1 = (p[i].x - p[i - 1].x) / (p[i].z - p[i - 1].z);
-                slope2 = (p[i+1].x - p[i].x) / (p[i+1].z - p[i].z);
-
-                
-                if (slope1 == slope2)
-                {
-                    p[i].mark = 8;
-                }
-            }
-        }
-
-        //Last point
-        if (p[p.Count-1].z == p[0].z && p[p.Count-2].z == p[p.Count - 1].z)
-        {
-            p[p.Count - 1].mark = 8;
-        }
-        else
-        if (p[p.Count - 1].z == p[0].z || p[p.Count - 2].z == p[p.Count - 1].z)
-        {
-            // make sure divisor does not equal to 0
-        }
-        else
-        {
-            slope1 = (p[p.Count-1].x - p[p.Count - 2].x) / (p[p.Count-1].z - p[p.Count - 2].z);
-            slope2 = (p[0].x - p[p.Count-1].x) / (p[0].z - p[p.Count-1].z);
-            if (slope1 == slope2)
-            {
-                p[p.Count - 1].mark = 8;
-            }
-        }
-        for (int i = 0; i < p.Count; i++)
-        {
-            if (p[i].mark == 8)
-            {
-                p.RemoveAll(Mark_8);
-            }
-        }
-    }
-
     private void CleanDuplicate(List<Point> p)
     {
         for(int i=0;i<p.Count-1;i++)
@@ -315,91 +236,7 @@ public class Genareate : MonoBehaviour
         else
             return false;
     }
-
-
-
-    //void Shrink(List<Point> p, string property)
-    //{
-    //    //First point;
-
-    //    float Distance;
-    //    float Scale=0;
-
-    //    switch (property)
-    //    { 
-    //    case "industry":
-    //        {
-    //            Distance = Building[1].localScale.x / 2 * root2 + RoadWigth*root2;
-               
-    //        }
-    //            break;
-
-
-    //        case "commercial":
-
-    //        {
-    //            Distance = Building[2].localScale.x / 2 * root2 + RoadWigth * root2;
-                
-    //        }
-    //            break;
-
-    //        case "residential":
-    //        {
-    //            Distance = Building[0].localScale.x / 2 * root2 + RoadWigth * root2;
-                
-    //        }
-    //            break;
-
-    //        default:
-    //        {
-    //            Debug.Log("No property, No shrink");
-                
-    //        }
-    //            return;
-
-    //    }
-
-    //    float sumx=0;
-    //    float sumz=0;
-
-    //    for (int i=0;i<p.Count;i++)
-    //    {
-    //        sumx += p[i].x;
-    //        sumz += p[i].z;
-    //    }
-
-
-
-    //    Point middlepoint = new Point();
-    //    middlepoint.x = sumx / p.Count;
-    //    middlepoint.z = sumz / p.Count;
-
-    //    //ShowPoint(middlepoint);
-
-    //    for (int i=0;i<p.Count;i++)
-    //    {
-    //        float length=Mathf.Sqrt((p[i].x-middlepoint.x)* (p[i].x - middlepoint.x)+(p[i].z - middlepoint.z)* (p[i].z - middlepoint.z));
-    //        if (length <= Distance)
-    //        {
-    //            Debug.Log("not enough");
-    //            return;
-    //        }
-
-    //        float NewScale = Distance / length;
-
-    //        if (NewScale>Scale)
-    //        {
-    //            Scale = Distance / length;
-    //        }
-
-    //        Scale = Distance / length;
-    //        float x = middlepoint.x + (p[i].x - middlepoint.x) * (1-Scale);
-    //        float z = middlepoint.z + (p[i].z - middlepoint.z) * (1-Scale);
-    //        Point point = new Point(x, z, 0);
-    //        SmallPolygon.Add(point);
-            
-    //    }
-    //}
+ 
 
     Vector3 GenerateRandomPosition(float max_x, float max_z, float min_x, float min_z)
     {
@@ -418,17 +255,7 @@ public class Genareate : MonoBehaviour
         int app = 0;
         bool flag =false;
         int seed;
-        int num=3;
-        //if (population<100)
-        // num= (int)(population/5)+1;
-        //else 
-        //    if (population < 1000)
-        //    num = (int)(population /25) + 1;
-        //else
-        //    if (population < 2000)
-        //    num = (int)(population / 40) + 1;
-        //else
-        //    num = (int)(population / 70) + 1;
+        int num=50;
         Vector3 pos = new Vector3();
         Point pos1 = new Point();        
             
@@ -455,14 +282,16 @@ public class Genareate : MonoBehaviour
 
                             pos1.x = pos.x;
                             pos1.z = pos.z;
-                            if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[1]) && Minor_test(pos1, Minor, Building[1]) && Slope_test(pos1))
+                            if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[1]) && Road_test(pos1, Points, Building[1]) && Slope_test(pos1))
                             {
                                 flag = true;
                                 Transform Buildings = Instantiate(Building[1]);
                                 Buildings.SetParent(transform, false);
                                 Buildings.localPosition = pos;
+                               
                                 buliding1.Add(Buildings);
                                 index++;
+                                
                             }
                         }
                         
@@ -489,8 +318,7 @@ public class Genareate : MonoBehaviour
                            
   
 
-                            pos1.x = pos.x;
-                            pos1.z = pos.z;
+                          
 
                             seed = UnityEngine.Random.Range(0, 99);
                         
@@ -500,7 +328,10 @@ public class Genareate : MonoBehaviour
                                 pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
                                 pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
                                        + Building[2].localScale.y / 2 - 0.2f;
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[2]) && Minor_test(pos1, Minor, Building[2]) && Slope_test(pos1))
+
+                                pos1.x = pos.x;
+                                pos1.z = pos.z;
+                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[2]) && Road_test(pos1, Points, Building[2]) && Slope_test(pos1))
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[2]);
@@ -508,6 +339,9 @@ public class Genareate : MonoBehaviour
                                     Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
                                     index++;
+
+                                   // Debug.Log("local:" + Buildings.position.x + " " + Buildings.position.y + " " + Buildings.position.z);
+                                    //Debug.Log("global:" + Buildings.localPosition.x + " " + Buildings.localPosition.y + " " + Buildings.localPosition.z);
                                 }
                             }
                             else
@@ -516,7 +350,9 @@ public class Genareate : MonoBehaviour
                                 pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
                                 pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
                                        + Building[3].localScale.y / 2 - 0.2f;
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Minor_test(pos1, Minor, Building[3]) && Slope_test(pos1))
+                                pos1.x = pos.x;
+                                pos1.z = pos.z;
+                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Road_test(pos1, Points, Building[3]) && Slope_test(pos1))
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[3]);
@@ -524,8 +360,12 @@ public class Genareate : MonoBehaviour
                                     Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
                                     index++;
+
+                                   // Debug.Log("local:" + Buildings.position.x + " " + Buildings.position.y + " " + Buildings.position.z);
+                                   // Debug.Log("local:" + Buildings.localPosition.x + " " + Buildings.localPosition.y + " " + Buildings.localPosition.z);
                                 }
                             }
+                          
                         }
                         
                         flag = false;
@@ -548,18 +388,20 @@ public class Genareate : MonoBehaviour
                             }
 
                            
-                            pos1.x = pos.x;
-                            pos1.z = pos.z;
 
                             seed = UnityEngine.Random.Range(0, 99);
                            
-                            if (seed < (11+(density-0.003)/0.032*300))
+                            if (seed < 11)
                                 {
                                  
                                 pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
                                 pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
                                        + Building[3].localScale.y / 2 - 0.2f;
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Minor_test(pos1, Minor, Building[3]) && Slope_test(pos1))
+
+
+                                pos1.x = pos.x;
+                                pos1.z = pos.z;
+                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Road_test(pos1, Points, Building[3]) && Slope_test(pos1))
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[3]);
@@ -579,7 +421,10 @@ public class Genareate : MonoBehaviour
                                 pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
                                        + Building[0].localScale.y / 2 - 0.2f;
 
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[0]) && Minor_test(pos1, Minor, Building[0]) && Slope_test(pos1))
+                                pos1.x = pos.x;
+                                pos1.z = pos.z;
+
+                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[0]) && Road_test(pos1, Points, Building[0]) && Slope_test(pos1))
                                 {
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[0]);
@@ -595,10 +440,12 @@ public class Genareate : MonoBehaviour
                                 pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
                                 pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
                                        + Building[4].localScale.y / 2 - 0.2f;
+                                pos1.x = pos.x;
+                                pos1.z = pos.z;
 
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[4]) && Minor_test(pos1, Minor, Building[4]) && Slope_test(pos1))
+                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[4]) && Road_test(pos1, Points, Building[4]) && Slope_test(pos1))
                                 {
-                                    Debug.Log("seed3 :" + seed);
+                                   // Debug.Log("seed3 :" + seed);
                                     flag = true;
                                     Transform Buildings = Instantiate(Building[4]);
                                     Buildings.SetParent(transform, false);
@@ -622,6 +469,41 @@ public class Genareate : MonoBehaviour
                 return;
         }
     }
+
+    private bool Road_test(Point p, List<Point> road, Transform transform)
+    {
+        float distance = 3+root2*RoadWidth + Mathf.Sqrt(transform.localScale.x / 2 * transform.localScale.x / 2 + transform.localScale.y / 2 * transform.localScale.y / 2);
+        //Debug.Log("x "+transform.localScale.x / 2);
+        //Debug.Log("distance "+distance);
+       for(int i=0;i<road.Count;i++)
+        {
+          if(PointToLine(road[i],road[(i + 1) % road.Count],p)<=distance)
+            {
+                return false;
+            }
+           
+        }
+        //for (int i = 0; i < road.Count; i++)
+        //{
+
+        //    Debug.Log("标准距离 " + distance);
+        //    Debug.Log("距离"+PointToLine(road[i], road[(i + 1) % road.Count], p));
+        //    Debug.Log("start x " + road[i].x + "start z" + road[i].z);
+        //    Debug.Log("end x " + road[(i + 1) % road.Count].x + "end z" + road[(i + 1) % road.Count].z);
+        //    Debug.Log("x " + p.x + " z" + p.z);
+        //    float a = LineLength(road[i], road[(i + 1) % road.Count]);
+        //    float b = LineLength(road[i], p);
+        //    float c = LineLength(road[(i + 1) % road.Count], p);
+
+        //    float pc = (a + b + c) / 2;
+        //    Debug.Log("半周长"+pc);
+        //    float s = Mathf.Sqrt(pc * (pc - a) * (pc - b) * (pc - c));
+        //    Debug.Log("面积"+s);
+        //}
+       
+        return true;
+    }
+
     //input pos : the position of generating building
     //
     //output: Null
@@ -631,7 +513,7 @@ public class Genareate : MonoBehaviour
 
     private bool Slope_test(Point p)
     {
-        if (terrainData.GetSteepness((p.x) / terrainData.size.x, (p.z) / terrainData.size.z) > 30f)
+        if (terrainData.GetSteepness((p.x) / terrainData.size.x, (p.z) / terrainData.size.z) > 90f)
         {
             return false;
         }
@@ -654,7 +536,7 @@ public class Genareate : MonoBehaviour
         {
             for (int i = 0; i < b.Count; i++)
             {
-                if ((Mathf.Abs(b[i].localPosition.z - p.z) < (b[i].localScale.z+building.localScale.z)) || (Mathf.Abs(b[i].localPosition.x - p.x)) < (b[i].localScale.x/2 + building.localScale.x/2))
+                if ((Mathf.Abs(b[i].localPosition.z - p.z) < (b[i].localScale.z/2+building.localScale.z/2)) || (Mathf.Abs(b[i].localPosition.x - p.x)) < (b[i].localScale.x/2 + building.localScale.x/2))
                 {
                     return false;
                 }
@@ -669,55 +551,25 @@ public class Genareate : MonoBehaviour
         }
         return true;
     }
-
-    //input : p:test point, b:list of generated building, building: testing object
-    //
-    //output: result of test
-    //
-    //test the deistance between this position and minor roads. 
-
-    private bool Minor_test(Point p, List<Point> b,Transform building)
-    {
-        if (b.Count == 0)
-        {
-            return true;
-        }
-        else
-        {
-            for (int i = 0; i < b.Count; i++)
-            {
-                if ((Mathf.Abs(b[i].z - (p.z)) < (RoadWigth*root2+building.localScale.z*root2)) && ((Mathf.Abs(b[i].x - (p.x + terrainData.bounds.extents.x))) < (RoadWigth * root2 + building.localScale.z * root2)))
-                {
-                    return false;
-                }
-            }
-
-        }
-        return true;
-    }
-
-
-
-
     //
     //
     //Inside test for point
     //
     //
 
-bool pointInRegion(Point pt, List<Point> plist)
+bool Inside_test(Point pt, List<Point> plist)
     {
-        int nCross = 0;    // 定义变量，统计目标点向右画射线与多边形相交次数
+        int nCross = 0;   
 
         for (int i = 0; i < plist.Count; i++)
-        {   //遍历多边形每一个节点
+        {   
 
             Point p1;
             Point p2;
 
             p1 = plist[i];
-            p2 = plist[(i + 1) % plist.Count];  // p1是这个节点，p2是下一个节点，两点连线是多边形的一条边
-                                                 // 以下算法是用是先以y轴坐标来判断的
+            p2 = plist[(i + 1) % plist.Count];  
+                                                 
 
             if (p1.z == p2.z)
                 continue;   //如果这条边是水平的，跳过
@@ -748,81 +600,7 @@ bool pointInRegion(Point pt, List<Point> plist)
     }
 
 
-    private bool Inside_test(Point checkPoint, List<Point> polygonPoints)
-    {
-        int counter = 0;
-        int i;
-        float xinters;
-        Point p1, p2;
-        int pointCount = polygonPoints.Count;
-        p1 = polygonPoints[0];
-        for (i = 1; i <= pointCount; i++)
-        {
-            p2 = polygonPoints[i % pointCount];
-            if (checkPoint.z > Math.Min(p1.z, p2.z)//校验点的Y大于线段端点的最小Y  
-                && checkPoint.z <= Math.Max(p1.z, p2.z))//校验点的Y小于线段端点的最大Y  
-            {
-                if (checkPoint.x <= Math.Max(p1.x, p2.x))//校验点的X小于等线段端点的最大X(使用校验点的左射线判断).  
-                {
-                    if (p1.z != p2.z)//线段不平行于X轴  
-                    {
-                        xinters = (checkPoint.z - p1.z) * (p2.x - p1.x) / (p2.z - p1.z) + p1.x;
-                        if (p1.x == p2.x || checkPoint.x <= xinters)
-                        {
-                            counter++;
-                        }
-                    }
-                }
-
-            }
-            p1 = p2;
-        }
-
-        if (counter % 2 == 0)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
-    //bool Inside_test(Point a, List<Point> p)
-    //{
-    //    //bool res=false;
-
-    //    //int i;
-    //    //int j = p.Count - 1;
-    //    //float res1;
-    //    //float res2;
-
-    //    //int right=0;
-    //    //int left=0;
-    //    //for (i = 0; i < p.Count;i++)
-    //    //{         
-    //    //    if(p[i].z<a.z&& p[j].z>=a.z|| p[j].z<a.z&& p[i].z>=a.z )
-    //    //    {
-    //    //        res1 = (p[i].x+(a.z - p[i].z)) / (p[j].z - p[i].z) * (p[j].x - p[i].x);
-                
-    //    //        if(res1<a.x)
-    //    //        {
-    //    //            res = !res;
-    //    //        }
-    //    //    }
-    //    //    j = i;
-    //    //}
-    //    //return res;
-    //}
-
-    ////private IEnumerator CreateChildren()
-    ////{
-    ////    for (int i = 0; i < Num; i++)
-    ////    {
-    ////        yield return new WaitForSeconds(0.1f);
-    ////        BuildingGeneration(max_x, max_z, min_x, min_z, 1, Polygon,property);
-    ////    }
-    //}
+   
 
     void ShowBoundary(List<Point> P, Transform t)
     {
@@ -854,7 +632,7 @@ bool pointInRegion(Point pt, List<Point> plist)
 
         //CleanUnnecessaryPoints(Polygon);
 
-        //ShowBoundary(Polygon,test2);
+       // ShowBoundary(Polygon,test2);
      
         //Shrink(Polygon, property);
 
@@ -893,6 +671,45 @@ bool pointInRegion(Point pt, List<Point> plist)
 
         BuildingGeneration(max_x, max_z, min_x, min_z, Polygon, property, Density, Population);
     }
+    private float LineLength(Point a, Point b)
+    {
+        float Length = 0;
+        Length = Mathf.Sqrt((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z));
+
+        return Length;
+
+    }
+
+    private float PointToLine(Point start, Point end, Point test)
+    {
+        float length = 0;
+        float a, b, c;
+        a = LineLength(start, end);   
+        b = LineLength(start, test);   
+        c = LineLength(end, test);   
+        if (c <= 0.000001 || b <= 0.000001)
+        {
+            length = 0;
+            return length;
+        }
+        if (c * c >= a * a + b * b)
+        {
+            length = b;
+            return length;
+        }
+        if (b * b >= a * a + c * c)
+        {
+            length = c;
+            return length;
+        }
+        float p = (a + b + c) / 2;
+        //Debug.Log(p);
+        float s = Mathf.Sqrt(p * (p - a) * (p - b) * (p - c));
+        //Debug.Log(s);
+        length = 2 * s / a;
+        //Debug.Log(length);
+        return length;
+    }
 
 
 
@@ -905,9 +722,9 @@ bool pointInRegion(Point pt, List<Point> plist)
     {
         // Debug.Log("start" + LandData.Landuse.Count);     
 
-         for(int i=0; i<LandData.Landuse.Count;i++)
+        for(int i=0; i<LandData.Landuse.Count;i++)
 
-        //for (int i = 0; i < 3; i++)
+        //for (int i = 0; i < 1; i++)
         {
 
             property = LandData.Landuse[i].Land_usage;
@@ -917,8 +734,7 @@ bool pointInRegion(Point pt, List<Point> plist)
                 continue;
             }
 
-            Points= LandData.Landuse[i].Polygon;
-         
+            Points= LandData.Landuse[i].Polygon;  
             Population = LandData.Landuse[i].Population;
             Density = LandData.Landuse[i].Population_density;
             BuildingPlacement();
