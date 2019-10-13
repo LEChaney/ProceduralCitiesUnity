@@ -544,7 +544,7 @@ public class Genareate : MonoBehaviour
 
     private bool Slope_test(Point p)
     {
-        if (terrainData.GetSteepness((p.x) / terrainData.size.x, (p.z) / terrainData.size.z) > 390f)
+        if (terrainData.GetSteepness((p.x) / terrainData.size.x, (p.z) / terrainData.size.z) >60f)
         {
             return false;
         }
