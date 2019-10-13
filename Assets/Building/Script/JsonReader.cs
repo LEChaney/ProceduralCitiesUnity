@@ -66,56 +66,58 @@ public class JsonReader : MonoBehaviour
         Debug.Log("MAXD: " + max_d);
         Debug.Log("MIND: " + min_d);
 
+
+
         for (int i = 0; i < data.Landuse.Count; i++)
         {
-            if (data.Landuse[i].Population_density < 0.01)
+            if (data.Landuse[i].Population_density < 0.01 && data.Landuse[i].Land_usage == "commercial")
                 a1++;
             else
-                if (data.Landuse[i].Population_density < 0.02)
+                if (data.Landuse[i].Population_density < 0.02 && data.Landuse[i].Land_usage == "commercial")
                 a2++;
             else
-                if (data.Landuse[i].Population_density < 0.03)
+                if (data.Landuse[i].Population_density < 0.03 && data.Landuse[i].Land_usage == "commercial")
                 a3++;
-          
-                if (data.Landuse[i].Population_density < 0.002)
+
+            if (data.Landuse[i].Population_density < 0.002 && data.Landuse[i].Land_usage == "commercial")
                 a4++;
             else
-                if (data.Landuse[i].Population_density < 0.004)
+            if (data.Landuse[i].Population_density < 0.004 && data.Landuse[i].Land_usage == "commercial")
                 a5++;
             else
-                if (data.Landuse[i].Population_density < 0.006)
+            if (data.Landuse[i].Population_density < 0.006 && data.Landuse[i].Land_usage == "commercial")
                 a6++;
             else
-                if (data.Landuse[i].Population_density < 0.008)
+            if (data.Landuse[i].Population_density < 0.008 && data.Landuse[i].Land_usage == "commercial")
                 a7++;
         }
         for (int i = 0; i < data.Landuse.Count; i++)
         {
-            if (data.Landuse[i].Population < 1000)
+            if (data.Landuse[i].Population < 1000 && data.Landuse[i].Land_usage == "residential")
                 b1++;
             else
-                if (data.Landuse[i].Population < 2000)
+                if (data.Landuse[i].Population < 2000 && data.Landuse[i].Land_usage == "residential")
                 b2++;
             else
-                if (data.Landuse[i].Population < 3000)
+                if (data.Landuse[i].Population < 3000 && data.Landuse[i].Land_usage == "residential")
                 b3++;
             else
-            if (data.Landuse[i].Population < 4300)
+            if (data.Landuse[i].Population < 4300 && data.Landuse[i].Land_usage == "residential")
                 b4++;
-           
-            if (data.Landuse[i].Population < 100)
+
+            if (data.Landuse[i].Population < 100 && data.Landuse[i].Land_usage == "residential")
                 b5++;
             else
-            if (data.Landuse[i].Population < 200)
+            if (data.Landuse[i].Population < 200 && data.Landuse[i].Land_usage == "residential")
                 b6++;
             else
-            if (data.Landuse[i].Population < 300)
+            if (data.Landuse[i].Population < 300 && data.Landuse[i].Land_usage == "residential")
                 b7++;
             else
-            if (data.Landuse[i].Population < 600)
+            if (data.Landuse[i].Population < 600 && data.Landuse[i].Land_usage == "residential")
                 b8++;
             else
-            if (data.Landuse[i].Population < 900)
+            if (data.Landuse[i].Population < 900 && data.Landuse[i].Land_usage == "residential")
                 b9++;
         }
 

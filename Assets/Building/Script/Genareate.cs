@@ -263,7 +263,7 @@ public class Genareate : MonoBehaviour
                 {
                 case "industry":
                     {
-
+                        
                         for (int index = 0; index < num;)
                       {
                         
@@ -305,77 +305,128 @@ public class Genareate : MonoBehaviour
                 {
                     for (int index = 0; index < num;)
                     {
-                        
-                        while (!flag)
+                        if (density < 0.002)
                         {
-                            app++;
-                            if (app > 1000)
+                            while (!flag)
                             {
-                                Debug.Log("Too much buildings");
-                                return;
-                            }
-
-                           
-  
-
-                          
-
-                            seed = UnityEngine.Random.Range(0, 99);
-                        
-                             if (seed < 19)
-                            {
-                                
-                                pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
-                                pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
-                                       + Building[2].localScale.y / 2 - 0.2f;
-
-                                pos1.x = pos.x;
-                                pos1.z = pos.z;
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[2]) && Road_test(pos1, Points, Building[2]) && Slope_test(pos1))
+                                app++;
+                                if (app > 1000)
                                 {
-                                    flag = true;
-                                    Transform Buildings = Instantiate(Building[2]);
-                                    Buildings.SetParent(transform, false);
-                                    Buildings.localPosition = pos;
-                                    buliding1.Add(Buildings);
-                                    index++;
-
-                                   // Debug.Log("local:" + Buildings.position.x + " " + Buildings.position.y + " " + Buildings.position.z);
-                                    //Debug.Log("global:" + Buildings.localPosition.x + " " + Buildings.localPosition.y + " " + Buildings.localPosition.z);
+                                    Debug.Log("Too much buildings");
+                                    return;
                                 }
-                            }
-                            else
-                            {
-                                
-                                pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
-                                pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
-                                       + Building[3].localScale.y / 2 - 0.2f;
-                                pos1.x = pos.x;
-                                pos1.z = pos.z;
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Road_test(pos1, Points, Building[3]) && Slope_test(pos1))
+
+                                seed = UnityEngine.Random.Range(0, 99);
+
+                                if (seed < 30)
                                 {
-                                    flag = true;
-                                    Transform Buildings = Instantiate(Building[3]);
-                                    Buildings.SetParent(transform, false);
-                                    Buildings.localPosition = pos;
-                                    buliding1.Add(Buildings);
-                                    index++;
 
-                                   // Debug.Log("local:" + Buildings.position.x + " " + Buildings.position.y + " " + Buildings.position.z);
-                                   // Debug.Log("local:" + Buildings.localPosition.x + " " + Buildings.localPosition.y + " " + Buildings.localPosition.z);
+                                    pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                    pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                           + Building[2].localScale.y / 2 - 0.2f;
+
+                                    pos1.x = pos.x;
+                                    pos1.z = pos.z;
+                                    if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[2]) && Road_test(pos1, Points, Building[2]) && Slope_test(pos1))
+                                    {
+                                        flag = true;
+                                        Transform Buildings = Instantiate(Building[2]);
+                                        Buildings.SetParent(transform, false);
+                                        Buildings.localPosition = pos;
+                                        buliding1.Add(Buildings);
+                                        index++;
+                                    }
                                 }
+                                else
+                                {
+
+                                    pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                    pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                           + Building[3].localScale.y / 2 - 0.2f;
+                                    pos1.x = pos.x;
+                                    pos1.z = pos.z;
+                                    if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Road_test(pos1, Points, Building[3]) && Slope_test(pos1))
+                                    {
+                                        flag = true;
+                                        Transform Buildings = Instantiate(Building[3]);
+                                        Buildings.SetParent(transform, false);
+                                        Buildings.localPosition = pos;
+                                        buliding1.Add(Buildings);
+                                        index++;
+                                    }
+                                }
+
                             }
-                          
+
+                            flag = false;
                         }
-                        
-                        flag = false;
+                        else
+                        {
+
+                            while (!flag)
+                            {
+                                app++;
+                                if (app > 1000)
+                                {
+                                    Debug.Log("Too much buildings");
+                                    return;
+                                }
+
+                                seed = UnityEngine.Random.Range(0, 99);
+
+                                if (seed < 30)
+                                {
+
+                                    pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                    pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                           + Building[2].localScale.y / 2 - 0.2f;
+
+                                    pos1.x = pos.x;
+                                    pos1.z = pos.z;
+                                    if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[2]) && Road_test(pos1, Points, Building[2]) && Slope_test(pos1))
+                                    {
+                                        flag = true;
+                                        Transform Buildings = Instantiate(Building[2]);
+                                        Buildings.SetParent(transform, false);
+                                        Buildings.localPosition = pos;
+                                        buliding1.Add(Buildings);
+                                        index++;
+                                    }
+                                }
+                                else
+                                {
+
+                                    pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
+                                    pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
+                                           + Building[3].localScale.y / 2 - 0.2f;
+                                    pos1.x = pos.x;
+                                    pos1.z = pos.z;
+                                    if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Road_test(pos1, Points, Building[3]) && Slope_test(pos1))
+                                    {
+                                        flag = true;
+                                        Transform Buildings = Instantiate(Building[3]);
+                                        Buildings.SetParent(transform, false);
+                                        Buildings.localPosition = pos;
+                                        buliding1.Add(Buildings);
+                                        index++;
+                                    }
+                                }
+
+                            }
+
+                            flag = false;
+                        }
                     }
                    
                 }
                 break;
             case "residential":
                 {
-                  
+                    if (density > 0.002)
+                        num = num / 30 + 1;
+                    else
+                        num = num / 5 + 1;
+
                     for (int index = 0; index < num;)
                     {        
                         while (!flag)
@@ -387,36 +438,34 @@ public class Genareate : MonoBehaviour
                                 return;
                             }
 
-                           
+             
 
-                            seed = UnityEngine.Random.Range(0, 99);
+                       
                            
-                            if (seed < 11)
-                                {
-                                 
+                            if (density <= 0.002)
+                            {
+
                                 pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
                                 pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
-                                       + Building[3].localScale.y / 2 - 0.2f;
-
-
+                                       + Building[4].localScale.y / 2 - 0.2f;
                                 pos1.x = pos.x;
                                 pos1.z = pos.z;
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[3]) && Road_test(pos1, Points, Building[3]) && Slope_test(pos1))
+
+                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[4]) && Road_test(pos1, Points, Building[4]) && Slope_test(pos1))
                                 {
+                                    // Debug.Log("seed3 :" + seed);
                                     flag = true;
-                                    Transform Buildings = Instantiate(Building[3]);
-                                    //Buildings.localScale *= 100;
+                                    Transform Buildings = Instantiate(Building[4]);
                                     Buildings.SetParent(transform, false);
                                     Buildings.localPosition = pos;
                                     buliding1.Add(Buildings);
+                                    index++;
                                 }
                             }
                             else
                             
-                             if (seed < (79 - ((density - 0.003) / 0.032) *300))
-                            {
-
-                                 
+                             
+                            { 
                                 pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
                                 pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
                                        + Building[0].localScale.y / 2 - 0.2f;
@@ -434,26 +483,8 @@ public class Genareate : MonoBehaviour
                                     index++;
                                 }
                             }
-                            else
-                            {
-                                
-                                pos = GenerateRandomPosition(max_x, max_z, min_x, min_z);
-                                pos.y = terrainData.GetInterpolatedHeight((pos.x / terrainData.size.x), ((pos.z / terrainData.size.z)))
-                                       + Building[4].localScale.y / 2 - 0.2f;
-                                pos1.x = pos.x;
-                                pos1.z = pos.z;
-
-                                if (Inside_test(pos1, p) && Distance_test(pos1, buliding1, Building[4]) && Road_test(pos1, Points, Building[4]) && Slope_test(pos1))
-                                {
-                                   // Debug.Log("seed3 :" + seed);
-                                    flag = true;
-                                    Transform Buildings = Instantiate(Building[4]);
-                                    Buildings.SetParent(transform, false);
-                                    Buildings.localPosition = pos;
-                                    buliding1.Add(Buildings);
-                                    index++;
-                                }
-                            }
+                            
+                           
                         }
 
                         flag = false;
@@ -513,7 +544,7 @@ public class Genareate : MonoBehaviour
 
     private bool Slope_test(Point p)
     {
-        if (terrainData.GetSteepness((p.x) / terrainData.size.x, (p.z) / terrainData.size.z) > 90f)
+        if (terrainData.GetSteepness((p.x) / terrainData.size.x, (p.z) / terrainData.size.z) > 390f)
         {
             return false;
         }
@@ -536,17 +567,10 @@ public class Genareate : MonoBehaviour
         {
             for (int i = 0; i < b.Count; i++)
             {
-                if ((Mathf.Abs(b[i].localPosition.z - p.z) < (b[i].localScale.z/2+building.localScale.z/2)) || (Mathf.Abs(b[i].localPosition.x - p.x)) < (b[i].localScale.x/2 + building.localScale.x/2))
+                if ((Mathf.Abs(b[i].localPosition.z - p.z) < (b[i].localScale.z/2+building.localScale.z/2)+10) && (Mathf.Abs(b[i].localPosition.x - p.x)) < (b[i].localScale.x/2 + building.localScale.x/2)+10)
                 {
                     return false;
                 }
-                //else
-                //{
-                //    //Debug.Log("distance Z " + (Mathf.Abs(b[i].localPosition.z - p.z) + "distance X " + Mathf.Abs(b[i].localPosition.x - p.x)));
-                //    //Debug.Log("distance Z " + (Mathf.Abs(b[i].localPosition.z - p.z) + "distance Z " + Mathf.Abs(b[i].localPosition.x - p.x)));
-                //    //Debug.Log("distance Z " + (Mathf.Abs(b[i].localPosition.z - p.z) + "distance Z " + Mathf.Abs(b[i].localPosition.x - p.x)));
-                //    //Debug.Log("distance Z " + (Mathf.Abs(b[i].localPosition.z - p.z) + "distance Z " + Mathf.Abs(b[i].localPosition.x - p.x)));
-                //}
             }   
         }
         return true;
