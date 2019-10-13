@@ -423,7 +423,7 @@ public class Genareate : MonoBehaviour
             case "residential":
                 {
                     if (density > 0.002)
-                        num = num / 30 + 1;
+                        num = num / 20 + 1;
                     else
                         num = num / 5 + 1;
 
