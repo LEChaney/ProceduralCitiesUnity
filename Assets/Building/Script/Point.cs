@@ -20,7 +20,7 @@ public class Point
     //1 : the points on the polygone
     //2 : the points ont the minor road 
     //6 : the intersection between minor and major road
-    //8 : duplicate elements
+    //8 : duplicate points
 
     public Point(float a, float b, int c)
     {

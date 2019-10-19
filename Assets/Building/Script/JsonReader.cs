@@ -70,10 +70,10 @@ public class JsonReader : MonoBehaviour
 
         for (int i = 0; i < data.Landuse.Count; i++)
         {
-            if (data.Landuse[i].Population_density < 0.01 && data.Landuse[i].Land_usage == "commercial")
+            if ( data.Landuse[i].Land_usage == "commercial")
                 a1++;
             else
-                if (data.Landuse[i].Population_density < 0.02 && data.Landuse[i].Land_usage == "commercial")
+                if (data.Landuse[i].Land_usage == "residential")
                 a2++;
             else
                 if (data.Landuse[i].Population_density < 0.03 && data.Landuse[i].Land_usage == "commercial")
